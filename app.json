@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.mrobialwww.NGALAMPARK"
     },
     "web": {
       "bundler": "metro",
@@ -32,6 +33,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-secure-store"
       ]
     ],
     "experiments": {
