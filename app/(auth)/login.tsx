@@ -52,12 +52,20 @@ export default function Login() {
             />
             {error ? <Text>{error}</Text> : null}
             <Button title="Login" onPress={handleLogin} />
-            <Text>signup</Text>
-            <Button title="Signup" onPress={() => router.replace("/signup")} />
-            <Button
-                title="Lupa password"
-                onPress={() => router.replace("/sendReset")}
-            />
+            <View>
+                <Text>belum punya akun?</Text>
+                <Button
+                    title="Signup"
+                    onPress={() => router.replace("/signupOption")}
+                />
+            </View>
+            <View>
+                <Text>Lupa password?</Text>
+                <Button
+                    title="Lupa password"
+                    onPress={() => router.replace("/sendReset")}
+                />
+            </View>
         </View>
     );
 }

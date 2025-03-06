@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import { Redirect, useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { ActivityIndicator, Text, View, TouchableOpacity } from "react-native";
@@ -31,12 +32,14 @@ export default function Index() {
 
     return (
         <View>
-            <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-                <Text>Masuk</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/signupOption")}>
-                Daftar akun
-            </TouchableOpacity>
+            <Button
+                title="Masuk"
+                onPress={() => router.push("/(auth)/login")}
+            />
+            <Button
+                title="Daftar akun"
+                onPress={() => router.push("/signupOption")}
+            />
         </View>
     );
 }
