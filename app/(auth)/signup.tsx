@@ -73,9 +73,6 @@ export default function SignUp() {
                 onChangeText={setConfirmPassword}
                 secureTextEntry
             />
-            {role === "officer" ? (
-                <Input placeholder="KTP" value={KTP} onChangeText={setKTP} />
-            ) : null}
 
             {role == "officer" ? (
                 <TextInput
@@ -91,8 +88,8 @@ export default function SignUp() {
             <View>
                 <Text>Sudah punya akun?</Text>
                 <Button
-                    title="singup"
-                    onPress={() => router.replace("/signup")}
+                    title="login"
+                    onPress={() => router.replace("/login")}
                 />
             </View>
         </View>

@@ -1,20 +1,19 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { router } from "expo-router";
+import Button from "@/components/Button";
 
 const loginOption = () => {
     return (
         <View>
-            <TouchableOpacity
+            <Button
+                title="sebagai pengguna"
                 onPress={() => router.push("/(auth)/signup?role=user")}
-            >
-                sebagai pengguna
-            </TouchableOpacity>
-            <TouchableOpacity
+            />
+            <Button
+                title="sebagai petugas parkir"
                 onPress={() => router.push("/(auth)/signup?role=officer")}
-            >
-                sebagai petugas parkir
-            </TouchableOpacity>
+            />
         </View>
     );
 };
