@@ -9,7 +9,7 @@ import Button from "@/components/Button";
 export default function SendResetLink() {
     const [email, setEmail] = useState("");
 
-    const handleSendResetEmail = async () => {
+    const handleSendResetEmail = async (): Promise<void> => {
         try {
             await sendPasswordResetEmail(FIREBASE_AUTH, email);
             Alert.alert("Sukses", "Link reset password telah dikirim.");

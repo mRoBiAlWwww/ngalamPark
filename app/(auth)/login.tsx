@@ -5,10 +5,10 @@ import {
     sendEmailVerification,
     signInWithEmailAndPassword,
 } from "firebase/auth";
-import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../lib/firebaseconfig";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-
+import { doc, getDoc } from "firebase/firestore";
 // const OTP_EXPIRATION = 5 * 60 * 1000;
 
 export default function Login() {
@@ -16,13 +16,12 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [uid, setUid] = useState("");
 
     // const actionCodeSettings = {
     //     url: "https://exp.host/@mrobialwww/NGALAMPARK/home",
     //     handleCodeInApp: true,
     // };
-    const handleLogin = async () => {
+    const handleLogin = async (): Promise<void> => {
         try {
             const userCredential = await signInWithEmailAndPassword(
                 FIREBASE_AUTH,
@@ -30,7 +29,12 @@ export default function Login() {
                 password
             );
             await sendEmailVerification(userCredential.user);
-            router.replace("/(tabs)/home");
+            const userDoc = await getDoc(
+                doc(FIREBASE_DB, "users", userCredential.user.uid)
+            );
+            userDoc.data()?.role == "user"
+                ? router.replace("/homeUser")
+                : router.replace("/homeOfficer");
         } catch (err: any) {
             setError(err.message);
         }

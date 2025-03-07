@@ -3,18 +3,23 @@ import { useRouter } from "expo-router";
 import { Button, Text, View } from "react-native";
 import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
 
-export default function Profile() {
+const profile: React.FC = () => {
     const router = useRouter();
 
     const handleSignOut = async () => {
-        await signOut(FIREBASE_AUTH);
-        router.replace("/(auth)/login");
+        try {
+            await signOut(FIREBASE_AUTH);
+            router.replace("/(auth)/login");
+        } catch (error) {
+            console.error("Error saat sign out:", error);
+        }
     };
 
     return (
         <View>
-            <Text>Profile Page</Text>
+            <Text>profile Page</Text>
             <Button title="Sign Out" onPress={handleSignOut} />
         </View>
     );
-}
+};
+export default profile;

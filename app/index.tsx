@@ -1,48 +1,62 @@
 import Button from "@/components/Button";
+import { FIREBASE_AUTH, FIREBASE_DB } from "@/lib/firebaseconfig";
 import { Redirect, useRouter } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View, TouchableOpacity } from "react-native";
 
-export default function Index() {
+const index: React.FC = () => {
     const router = useRouter();
-    // const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [showLoader, setShowLoader] = useState<boolean>(true);
 
-    // useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
-    //         setIsLoggedIn(!!user); // true jika user ada, false jika null
-    //     });
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(
+            FIREBASE_AUTH,
+            async (user: User | null) => {
+                setIsLoading(false);
+                if (user) {
+                    try {
+                        const userDoc = await getDoc(
+                            doc(FIREBASE_DB, "users", user.uid)
+                        );
+                        const role = userDoc.data()?.role;
+                        if (role === "user") {
+                            router.replace("/homeUser");
+                        } else if (role === "officer") {
+                            router.replace("/homeOfficer");
+                        }
+                    } catch (error: any) {
+                        console.log(error.message);
+                    }
+                } else {
+                    router.replace("/defaultPage");
+                }
+            }
+        );
 
-    //     return () => unsubscribe(); // Bersihkan listener saat unmount
-    // }, []);
+        return () => unsubscribe();
+    }, []);
 
-    // if (isLoggedIn === null) {
-    //     // Tampilkan loading saat cek status autentikasi
-    //     return (
-    //         <View
-    //             style={{
-    //                 flex: 1,
-    //                 justifyContent: "center",
-    //                 alignItems: "center",
-    //             }}
-    //         >
-    //             <ActivityIndicator size="large" />
-    //         </View>
-    //     );
-    // }
+    useEffect(() => {
+        if (!isLoading) {
+            const timer = setTimeout(() => setShowLoader(false), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading]);
 
-    return (
-        <View>
-            <Button
-                title="Masuk"
-                onPress={() => router.push("/(auth)/login")}
-            />
-            <Button
-                title="Daftar akun"
-                onPress={() => router.push("/signupOption")}
-            />
-        </View>
-    );
-}
+    if (showLoader) {
+        return (
+            <View>
+                <ActivityIndicator size="large" />
+                <Text>Memuat...</Text>
+            </View>
+        );
+    }
+};
+
+export default index;
 {
     /* <Redirect href={isLoggedIn ? "/(tabs)/home" : "/(auth)/login"} />; */
 }

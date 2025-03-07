@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import Button from "@/components/Button";
 
-const loginOption = () => {
+const signupOption: React.FC = () => {
     return (
         <View>
             <Button
@@ -18,4 +18,4 @@ const loginOption = () => {
     );
 };
 
-export default loginOption;
+export default signupOption;
