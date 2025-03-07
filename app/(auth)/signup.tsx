@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View, TextInput, Button, Text, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -9,18 +9,20 @@ import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Input from "@/components/Input";
 
-export default function SignUp() {
-    const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [name, setName] = useState("");
-    const [password, setPassword] = useState("");
-    const [KTP, setKTP] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
-    const db = getFirestore();
-    const { role } = useLocalSearchParams();
+type Role = "user" | "officer";
 
-    const signUp = async () => {
+const signUp: React.FC = () => {
+    const router = useRouter();
+    const [email, setEmail] = useState<string>("");
+    const [name, setName] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [KTP, setKTP] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [error, setError] = useState<string>("");
+    const db = getFirestore();
+    const { role } = useLocalSearchParams<{ role: Role }>();
+
+    const signUp = async (): Promise<void> => {
         try {
             if (password !== confirmPassword) {
                 Alert.alert("Password tidak cocok!");
@@ -34,7 +36,7 @@ export default function SignUp() {
             );
 
             const uid = userCredential.user.uid;
-            if (role == "user") {
+            if (role === "user") {
                 await setDoc(doc(db, "users", uid), {
                     name,
                     role,
@@ -57,10 +59,10 @@ export default function SignUp() {
 
     return (
         <View>
-            <Text>daftar akun</Text>
-            <Text>{role === "user" ? "pengguna" : "petugas parkir"}</Text>
-            <Input placeholder="name" value={name} onChangeText={setName} />
-            <Input placeholder="email" value={email} onChangeText={setEmail} />
+            <Text>Daftar Akun</Text>
+            <Text>{role === "user" ? "Pengguna" : "Petugas Parkir"}</Text>
+            <Input placeholder="Name" value={name} onChangeText={setName} />
+            <Input placeholder="Email" value={email} onChangeText={setEmail} />
             <Input
                 placeholder="Password"
                 value={password}
@@ -74,27 +76,28 @@ export default function SignUp() {
                 secureTextEntry
             />
 
-            {role == "officer" ? (
+            {role === "officer" && (
                 <TextInput
                     placeholder="KTP"
                     value={KTP}
                     onChangeText={setKTP}
-                    secureTextEntry
                 />
-            ) : null}
+            )}
 
-            {error ? <Text>{error}</Text> : null}
+            {error && <Text>{error}</Text>}
             <Button title="Sign Up" onPress={signUp} />
             <View>
                 <Text>Sudah punya akun?</Text>
                 <Button
-                    title="login"
+                    title="Login"
                     onPress={() => router.replace("/login")}
                 />
             </View>
         </View>
     );
-}
+};
+
+export default signUp;
 
 {
     /* <View>
