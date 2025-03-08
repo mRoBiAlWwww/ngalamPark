@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Alert } from "react-native";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
+import { FIREBASE_AUTH } from "../lib/firebaseconfig";
 import { router } from "expo-router";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -13,7 +13,7 @@ export default function SendResetLink() {
         try {
             await sendPasswordResetEmail(FIREBASE_AUTH, email);
             Alert.alert("Sukses", "Link reset password telah dikirim.");
-            router.replace("/(auth)/login");
+            router.replace("/login");
         } catch (error: any) {
             Alert.alert("Error", error.message);
         }

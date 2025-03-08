@@ -1,32 +1,32 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { TextInput, View, Text } from "react-native";
 
-interface TextInputFieldProps {
+interface Input {
     placeholder: string;
     value: string;
     onChangeText: (text: string) => void;
     secureTextEntry?: boolean;
-    label?: string;
+    placeholderTextColor?: string;
 }
 
-const TextInputField: React.FC<TextInputFieldProps> = ({
+const Input: React.FC<Input> = ({
     placeholder,
     value,
     onChangeText,
     secureTextEntry = false,
-    label,
+    placeholderTextColor,
 }) => {
     return (
         <View>
-            {label && <Text>{label}</Text>}
             <TextInput
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}
                 secureTextEntry={secureTextEntry}
+                placeholderTextColor={placeholderTextColor}
             />
         </View>
     );
 };
 
-export default TextInputField;
+export default Input;

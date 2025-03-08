@@ -5,7 +5,7 @@ import {
     sendEmailVerification,
     signInWithEmailAndPassword,
 } from "firebase/auth";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../lib/firebaseconfig";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../lib/firebaseconfig";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { doc, getDoc } from "firebase/firestore";

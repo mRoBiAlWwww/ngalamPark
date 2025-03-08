@@ -11,7 +11,7 @@ const profileOfficer: React.FC = () => {
     const handleSignOut = async (): Promise<void> => {
         try {
             await signOut(FIREBASE_AUTH);
-            router.replace("/(auth)/login");
+            router.replace("/login");
         } catch (error: any) {
             console.error(error.message);
         }
