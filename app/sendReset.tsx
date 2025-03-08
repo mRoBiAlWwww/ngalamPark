@@ -20,7 +20,7 @@ export default function SendResetLink() {
     };
 
     return (
-        <View>
+        <View className="bg-white h-full ">
             <Input
                 placeholder="Masukkan Email"
                 value={email}

@@ -2,11 +2,12 @@ import React, { ReactNode } from "react";
 import { TextInput, View, Text } from "react-native";
 
 interface Input {
-    placeholder: string;
+    placeholder?: string;
     value: string;
     onChangeText: (text: string) => void;
     secureTextEntry?: boolean;
     placeholderTextColor?: string;
+    children?: ReactNode;
 }
 
 const Input: React.FC<Input> = ({
@@ -15,16 +16,19 @@ const Input: React.FC<Input> = ({
     onChangeText,
     secureTextEntry = false,
     placeholderTextColor,
+    children,
 }) => {
     return (
-        <View>
+        <View className="flex flex-row justify-between">
             <TextInput
+                style={{ flex: 1 }}
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}
                 secureTextEntry={secureTextEntry}
                 placeholderTextColor={placeholderTextColor}
             />
+            {children}
         </View>
     );
 };

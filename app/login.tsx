@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import {
     sendEmailVerification,
@@ -9,18 +9,15 @@ import { FIREBASE_AUTH, FIREBASE_DB } from "../lib/firebaseconfig";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { doc, getDoc } from "firebase/firestore";
-// const OTP_EXPIRATION = 5 * 60 * 1000;
+import Feather from "@expo/vector-icons/Feather";
 
 export default function Login() {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    // const actionCodeSettings = {
-    //     url: "https://exp.host/@mrobialwww/NGALAMPARK/home",
-    //     handleCodeInApp: true,
-    // };
     const handleLogin = async (): Promise<void> => {
         try {
             const userCredential = await signInWithEmailAndPassword(
@@ -39,95 +36,75 @@ export default function Login() {
             setError(err.message);
         }
     };
-    // const resetPassword = async () => {
-    //     await sendPasswordResetEmail(FIREBASE_AUTH, email);
-    //     alert("Cek email Anda untuk mengatur ulang kata sandi.");
-    // };
 
     return (
-        <View>
-            <Text>Login</Text>
-            <Input placeholder="Email" value={email} onChangeText={setEmail} />
-            <Input
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
+        <View className="bg-white h-full px-5">
+            <Text className="text-4xl font-extrabold mb-4">
+                Selamat datang di Ngalam Park!
+            </Text>
+            <Text className="text-xl font-bold text-gray-500">
+                Masuk menggunakan akunmu yang telah terverifikasi.
+            </Text>
+            <View>
+                <View className="my-8 border-b-2 border-gray-300">
+                    <Text className="text-lg font-semibold text-gray-500">
+                        Email
+                    </Text>
+                    <Input value={email} onChangeText={setEmail} />
+                </View>
+                <View className="border-b-2 border-gray-300">
+                    <Text className="text-lg font-semibold text-gray-500">
+                        Kata Sandi
+                    </Text>
+                    <Input
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!isPasswordVisible}
+                    >
+                        <TouchableOpacity
+                            onPress={() =>
+                                setIsPasswordVisible(!isPasswordVisible)
+                            }
+                        >
+                            <Feather
+                                name={isPasswordVisible ? "eye" : "eye-off"}
+                                size={24}
+                                color="rgb(200, 200, 200)"
+                            />
+                        </TouchableOpacity>
+                    </Input>
+                </View>
+            </View>
             {error ? <Text>{error}</Text> : null}
-            <Button title="Login" onPress={handleLogin} />
-            <View>
-                <Text>belum punya akun?</Text>
-                <Button
-                    title="Signup"
-                    onPress={() => router.replace("/signupOption")}
-                />
-            </View>
-            <View>
-                <Text>Lupa password?</Text>
-                <Button
-                    title="Lupa password"
-                    onPress={() => router.replace("/sendReset")}
-                />
-            </View>
+            <Button
+                componentStyle="flex-row justify-center my-5 text-2xl"
+                textStyle="text-primary font-bold"
+                title="Lupa kata sandi?"
+                onPress={() => router.replace("/sendReset")}
+            />
+            <Button
+                title="Masuk"
+                onPress={handleLogin}
+                componentStyle="bg-gray-200 px-5 py-3 rounded-full font-bold flex justify-center items-center w-full mx-auto "
+                textStyle="text-white text-lg font-custom"
+            />
+            <Text className="text-sm w-3/5 text-center mx-auto mt-5">
+                Saya setuju dengan{" "}
+                <Text
+                    className="text-primary text-sm"
+                    onPress={() => router.push("/")}
+                >
+                    kebijakan
+                </Text>{" "}
+                &{" "}
+                <Text
+                    className="text-primary text-sm"
+                    onPress={() => router.push("/")}
+                >
+                    privasi
+                </Text>{" "}
+                yang telah ditentukan
+            </Text>
         </View>
     );
 }
-
-// const db = getFirestore();
-
-// const generateOTP = () =>
-//     Math.floor(100000 + Math.random() * 900000).toString();
-// const sendOtp = async () => {
-//     try {
-//         const userCredential = await signInWithEmailAndPassword(
-//             FIREBASE_AUTH,
-//             email,
-//             password
-//         );
-//         const user = userCredential.user;
-//         setUid(user.uid);
-
-//         const setOtpCode = generateOTP();
-//         await setDoc(doc(db, "otps", user.uid), {
-//             otp: otpCode,
-//             createdAt: serverTimestamp(),
-//             expiresAt: Timestamp.fromMillis(Date.now() + OTP_EXPIRATION),
-//         });
-//     } catch (error: any) {
-//         console.error("Error saat mengirim OTP:", error.message);
-//         Alert.alert("Error", error.message);
-//     }
-// };
-
-// const verifyOtp = async () => {
-//     try {
-//         const otpRef = doc(db, "otps", uid);
-//         const otpDoc = await getDoc(otpRef);
-
-//         // if (!otpDoc.exists()) {
-//         //     Alert.alert("Gagal", "OTP tidak ditemukan.");
-//         //     return;
-//         // }
-
-//         const { otp: storedOtp, createdAt, expiresAt } = otpDoc.data();
-
-//         const isExpired = expiresAt.toMillis() < Date.now();
-//         if (isExpired) {
-//             await deleteDoc(otpRef);
-//             Alert.alert("Gagal", "OTP telah kedaluwarsa.");
-//             return;
-//         }
-
-//         if (otpCode !== storedOtp) {
-//             Alert.alert("Gagal", "OTP salah.");
-//             return;
-//         }
-
-//         await deleteDoc(otpRef);
-//         Alert.alert("Sukses", "OTP valid. Anda berhasil verifikasi!");
-//     } catch (error: any) {
-//         console.error("Error saat memverifikasi OTP:", error.message);
-//         Alert.alert("Error", error.message);
-//     }
-// };
