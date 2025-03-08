@@ -4,7 +4,7 @@ import { Redirect, useRouter } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 
 const index: React.FC = () => {
     const router = useRouter();

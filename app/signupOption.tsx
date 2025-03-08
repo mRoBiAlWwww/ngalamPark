@@ -6,7 +6,7 @@ import ForgotRafiki from "../assets/images/Forgot password-rafiki.svg";
 
 const signupOption: React.FC = () => {
     return (
-        <View className="flex items-center ">
+        <View className="flex items-center bg-white h-full ">
             <Text className="font-bold text-3xl mt-48 text-black">
                 Daftar Akun
             </Text>

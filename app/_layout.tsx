@@ -1,7 +1,9 @@
 import { router, Stack, useRouter } from "expo-router";
 import React from "react";
 import "../global.css";
-import { Button, StatusBar } from "react-native";
+import { StatusBar, TouchableOpacity } from "react-native";
+import Button from "@/components/Button";
+import Ionicons from "@expo/vector-icons/Ionicons";
 const RootLayout: React.FC = () => {
     const router = useRouter();
     return (
@@ -17,13 +19,19 @@ const RootLayout: React.FC = () => {
                 <Stack.Screen
                     name="login"
                     options={{
-                        title: "Detail",
+                        title: " ",
                         headerShown: true,
                         headerLeft: () => (
-                            <Button
-                                title="← Back"
+                            <TouchableOpacity
+                                style={{ marginTop: 10 }}
                                 onPress={() => router.back()}
-                            />
+                            >
+                                <Ionicons
+                                    name="arrow-back"
+                                    size={30}
+                                    color="black"
+                                />
+                            </TouchableOpacity>
                         ),
                     }}
                 />

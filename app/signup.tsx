@@ -69,7 +69,11 @@ const signUp: React.FC = () => {
     };
 
     return (
-        <KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={150}>
+        <KeyboardAvoidingView
+            behavior={"padding"}
+            keyboardVerticalOffset={150}
+            className="bg-white h-full "
+        >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View className="flex items-center h-full">
                     <Text className="font-bold text-3xl mt-36 text-black">
