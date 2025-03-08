@@ -9,7 +9,7 @@ const profile: React.FC = () => {
     const handleSignOut = async () => {
         try {
             await signOut(FIREBASE_AUTH);
-            router.replace("/(auth)/login");
+            router.replace("/login");
         } catch (error) {
             console.error("Error saat sign out:", error);
         }

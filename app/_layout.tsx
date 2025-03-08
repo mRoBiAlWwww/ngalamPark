@@ -1,14 +1,34 @@
-import { Stack } from "expo-router";
+import { router, Stack, useRouter } from "expo-router";
 import React from "react";
-
+import "../global.css";
+import { Button, StatusBar } from "react-native";
 const RootLayout: React.FC = () => {
+    const router = useRouter();
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(user)" />
-            <Stack.Screen name="(officer)" />
-            <Stack.Screen name="index" />
-            <Stack.Screen name="signupOption" />
-        </Stack>
+        <>
+            <StatusBar barStyle="dark-content" />
+            <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(user)" />
+                <Stack.Screen name="(officer)" />
+                <Stack.Screen name="index" />
+                <Stack.Screen name="signupOption" />
+                <Stack.Screen name="signup" />
+                <Stack.Screen name="sendReset" />
+                <Stack.Screen
+                    name="login"
+                    options={{
+                        title: "Detail",
+                        headerShown: true,
+                        headerLeft: () => (
+                            <Button
+                                title="← Back"
+                                onPress={() => router.back()}
+                            />
+                        ),
+                    }}
+                />
+            </Stack>
+        </>
     );
 };
 
