@@ -6,8 +6,14 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                primary: "#33D3F8",
+                primary: "#01aed6",
                 grayForm: "#B6B6B6",
+                loginColor: "#F4FBF8",
+            },
+            fontFamily: {
+                work: ["WorkSans"],
+                workSemiBold: ["WorkSansSemiBold"],
+                maison: ["Maison"],
             },
         },
     },

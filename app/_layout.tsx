@@ -1,42 +1,70 @@
-import { router, Stack, useRouter } from "expo-router";
-import React from "react";
+import { Stack, useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
+import React, { useEffect } from "react";
 import "../global.css";
-import { StatusBar, TouchableOpacity } from "react-native";
-import Button from "@/components/Button";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { StatusBar } from "react-native";
+import * as Font from "expo-font";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync();
+
 const RootLayout: React.FC = () => {
-    const router = useRouter();
+    useEffect(() => {
+        setTimeout(() => {
+            SplashScreen.hideAsync();
+        }, 2000);
+    }, []);
+
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                WorkSans: require("../assets/fonts/WorkSans-Regular.ttf"),
+                WorkSansSemiBold: require("../assets/fonts/WorkSans-SemiBold.ttf"),
+                Maison: require("../assets/fonts/FontsFree-Net-Maison-Neue-Bold.ttf"),
+            });
+            await SplashScreen.hideAsync();
+        }
+        loadFonts();
+    }, []);
+
     return (
+        // <KeyboardProvider>
         <>
             <StatusBar barStyle="dark-content" />
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(user)" />
                 <Stack.Screen name="(officer)" />
+                <Stack.Screen name="(auth)" />
                 <Stack.Screen name="index" />
-                <Stack.Screen name="signupOption" />
+
+                {/* <Stack.Screen name="signupOption" />
                 <Stack.Screen name="signup" />
-                <Stack.Screen name="sendReset" />
                 <Stack.Screen
-                    name="login"
+                    name="sendReset"
                     options={{
-                        title: " ",
+                        title: "Setel Ulang Kata Sandi",
                         headerShown: true,
+                        headerShadowVisible: false,
+                        headerStyle: {
+                            backgroundColor: "#F4FBF8",
+                        },
                         headerLeft: () => (
                             <TouchableOpacity
-                                style={{ marginTop: 10 }}
+                                style={{ marginRight: 10, marginLeft: -10 }}
                                 onPress={() => router.back()}
                             >
-                                <Ionicons
-                                    name="arrow-back"
-                                    size={30}
-                                    color="black"
-                                />
+                                <Entypo name="cross" size={35} color="black" />
                             </TouchableOpacity>
                         ),
                     }}
                 />
+                <Stack.Screen name="login" /> */}
             </Stack>
+            <Toast />
         </>
+        // </KeyboardProvider>
     );
 };
 

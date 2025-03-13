@@ -21,7 +21,7 @@ const Input: React.FC<Input> = ({
     return (
         <View className="flex flex-row justify-between">
             <TextInput
-                style={{ flex: 1 }}
+                style={{ flex: 1, fontFamily: "WorkSans" }}
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}

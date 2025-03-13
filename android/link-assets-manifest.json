@@ -1,0 +1,21 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/FontsFree-Net-Maison-Neue-Bold.ttf",
+      "sha1": "4def3d80b6b3b89f7176710862ae58c4c2ab55e4"
+    },
+    {
+      "path": "assets/fonts/SpaceMono-Regular.ttf",
+      "sha1": "fae3a5a43b50e0408fd61e14383d94a023d332b0"
+    },
+    {
+      "path": "assets/fonts/WorkSans-Regular.ttf",
+      "sha1": "943c38fa3c44e48acc89c9547e30dc57991cb150"
+    },
+    {
+      "path": "assets/fonts/WorkSans-SemiBold.ttf",
+      "sha1": "d118e3c6fd7618bd7b36072336e5710871c99cc0"
+    }
+  ]
+}
