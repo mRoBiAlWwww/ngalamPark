@@ -38,29 +38,6 @@ const RootLayout: React.FC = () => {
                 <Stack.Screen name="(officer)" />
                 <Stack.Screen name="(auth)" />
                 <Stack.Screen name="index" />
-
-                {/* <Stack.Screen name="signupOption" />
-                <Stack.Screen name="signup" />
-                <Stack.Screen
-                    name="sendReset"
-                    options={{
-                        title: "Setel Ulang Kata Sandi",
-                        headerShown: true,
-                        headerShadowVisible: false,
-                        headerStyle: {
-                            backgroundColor: "#F4FBF8",
-                        },
-                        headerLeft: () => (
-                            <TouchableOpacity
-                                style={{ marginRight: 10, marginLeft: -10 }}
-                                onPress={() => router.back()}
-                            >
-                                <Entypo name="cross" size={35} color="black" />
-                            </TouchableOpacity>
-                        ),
-                    }}
-                />
-                <Stack.Screen name="login" /> */}
             </Stack>
             <Toast />
         </>
