@@ -73,13 +73,13 @@ const profile: React.FC = () => {
                     <View className="flex-row justify-between border-b-2 border-gray-300 mb-3 items-center">
                         <View className="flex-row gap-3 py-2 items-center mb-2">
                             <Motor />
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => router.push("/(user)/kendaraan")}>
                                 <Text className="font-work">
                                     Kendaraan Anda
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push("/(user)/kendaraan")}>
                             <MaterialIcons
                                 name="keyboard-arrow-right"
                                 size={30}
