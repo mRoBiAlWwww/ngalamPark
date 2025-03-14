@@ -83,6 +83,7 @@ const homeUser: React.FC = () => {
                 <ScrollView
                     className="pt-12 px-6"
                     contentContainerStyle={{ paddingBottom: 180 }}
+                    showsVerticalScrollIndicator={false}
                 >
                     <View className="mb-10">
                         <Text className="font-workSemiBold text-2xl">
