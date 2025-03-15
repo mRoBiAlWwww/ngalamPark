@@ -35,7 +35,7 @@ const homeUser: React.FC = () => {
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor="#01aed6" />
-            <View className="bg-white mb-20">
+            <View className="bg-defaultBackground mb-20">
                 <View className="bg-primary rounded-b-3xl relative z-40">
                     <View className="flex-row justify-around mt-8">
                         <View>
