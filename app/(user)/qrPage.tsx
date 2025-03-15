@@ -17,7 +17,9 @@ const qrPage: React.FC = () => {
         React.useCallback(() => {
             const fetchVehicleData = async () => {
                 try {
-                    const storedData = await AsyncStorage.getItem("vehicleData");
+                    const storedData = await AsyncStorage.getItem(
+                        "vehicleData"
+                    );
                     if (storedData) {
                         setVehicleData(JSON.parse(storedData));
                     }
@@ -34,14 +36,15 @@ const qrPage: React.FC = () => {
         : "Belum ada data kendaraan";
 
     return (
-        <View className="flex items-center bg-white h-full">
+        <View className="flex items-center bg-defaultBackground h-full">
             <StatusBar barStyle="dark-content" backgroundColor="#01aed6" />
             <View className="p-10 mt-32">
                 <Text className="font-workSemiBold text-black text-3xl">
                     Rasya Fariz
                 </Text>
                 <Text className="font-work text-black text-justify mt-1">
-                    Ini adalah QRCode kamu. Kamu bisa melakukan pembayaran dengan cara menunjukkan QRCode ini ke petugas parkir.
+                    Ini adalah QRCode kamu. Kamu bisa melakukan pembayaran
+                    dengan cara menunjukkan QRCode ini ke petugas parkir.
                 </Text>
             </View>
             <View className="flex-1 justify-center items-center mt-20">
@@ -55,8 +58,7 @@ const qrPage: React.FC = () => {
                 </View>
             </View>
             <View className="flex-1 justify-end w-full">
-                <View className="bg-primary rounded-t-full h-96">
-                </View>
+                <View className="bg-primary rounded-t-full h-96"></View>
             </View>
         </View>
     );

@@ -81,7 +81,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="profileUser"
+                name="(profileUser)"
                 options={{
                     title: "Profile",
                     tabBarIcon: ({ focused }) => (
@@ -99,7 +99,6 @@ export default function TabLayout() {
                     ),
                 }}
             />
-             <Tabs.Screen name="kendaraan" options={{ href: null }} />
         </Tabs>
     );
 }

@@ -8,7 +8,7 @@ const defaultPage: React.FC = () => {
     const router = useRouter();
 
     return (
-        <View className="flex items-center bg-white h-full ">
+        <View className="flex items-center bg-defaultBackground h-full ">
             <Text className="font-maison text-3xl mt-48 text-black">
                 NGALAMPARK
             </Text>
