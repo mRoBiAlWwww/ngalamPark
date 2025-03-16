@@ -23,7 +23,7 @@ export default function TabLayout() {
             }}
         >
             <Tabs.Screen
-                name="homeUser"
+                name="(home)"
                 options={{
                     title: "Beranda",
                     tabBarIcon: ({ focused }) => (

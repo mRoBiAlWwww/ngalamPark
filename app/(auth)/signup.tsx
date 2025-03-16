@@ -12,27 +12,30 @@ import {
     createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Button from "../../components/ButtonRegister";
 import InputRegister from "../../components/InputRegister";
 import Toast from "react-native-toast-message";
+import useDatabase from "../../hooks/useCreate";
 type Role = "user" | "officer";
 
 const signUp: React.FC = () => {
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [pass, setPass] = useState<string>("");
     const [KTP, setKTP] = useState<string>("");
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
-    const [isPasswordVisible3, setIsPasswordVisible3] = useState(false);
+    const [confirmPass, setConfirmPass] = useState<string>("");
+    const [callNumber, setCallNumber] = useState<string>("");
+    const [location, setLocation] = useState<string>("");
+    const [isPassVisible, setIsPassVisible] = useState<boolean>(false);
+    const [isPassVisible2, setIsPassVisible2] = useState<boolean>(false);
+    const [isPassVisible3, setIsPassVisible3] = useState<boolean>(false);
     const { role } = useLocalSearchParams<{ role: Role }>();
     const router = useRouter();
-    const db = getFirestore();
+    const { saveData } = useDatabase();
 
     const showToast = (message: string) => {
         Toast.show({
@@ -42,35 +45,52 @@ const signUp: React.FC = () => {
     };
 
     const isValidEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
-    const isWeakPassword = (password: string) => password.length < 8;
+    const isWeakPass = (pass: string) => pass.length < 8;
+    const isValidCallNumber = (callNumber: string) =>
+        /^08\d{10,11}$/.test(callNumber);
 
     const signUp = async (): Promise<void> => {
         try {
             if (!isValidEmail(email)) return showToast("Format email salah.");
-            if (isWeakPassword(password))
-                return showToast("Password minimal 8 karakter.");
-            if (password !== confirmPassword) {
-                return showToast("Password tidak cocok!");
+            if (isWeakPass(pass)) return showToast("Pass minimal 8 karakter.");
+            if (isValidCallNumber(callNumber)) {
+                return showToast(
+                    "Nomor wajib 12 atau 13 digit serta diawali dengan 08"
+                );
+            }
+            if (pass !== confirmPass) {
+                return showToast("Pass tidak cocok!");
             }
 
             const userCredential = await createUserWithEmailAndPassword(
                 FIREBASE_AUTH,
                 email,
-                password
+                pass
             );
 
             const uid = userCredential.user.uid;
             if (role === "user") {
-                await setDoc(doc(db, "users", uid), {
+                const userData: Record<string, any> = {
+                    id: uid,
                     name,
+                    callNumber,
                     role,
-                });
+                    saldo: {
+                        ovo: 800000,
+                        shopeepay: 100000,
+                    },
+                };
+                await saveData("users/" + uid, userData);
             } else {
-                await setDoc(doc(db, "users", uid), {
+                const userData: Record<string, any> = {
+                    id: uid,
                     name,
-                    KTP,
+                    callNumber,
+                    ktp: KTP,
                     role,
-                });
+                    location,
+                };
+                await saveData("officer/" + uid, userData);
             }
             await sendEmailVerification(userCredential.user);
             router.replace("/(auth)/login");
@@ -131,10 +151,23 @@ const signUp: React.FC = () => {
                             </InputRegister>
 
                             <InputRegister
+                                placeholder="0812345678910"
+                                value={callNumber}
+                                onChangeText={setCallNumber}
+                            >
+                                <Feather
+                                    name="phone-call"
+                                    size={24}
+                                    color="rgb(202, 202, 202)"
+                                    className="pr-3"
+                                />
+                            </InputRegister>
+
+                            <InputRegister
                                 placeholder="Kata sandi"
-                                value={password}
-                                onChangeText={setPassword}
-                                secure={!isPasswordVisible}
+                                value={pass}
+                                onChangeText={setPass}
+                                secure={!isPassVisible}
                             >
                                 <Feather
                                     name="lock"
@@ -144,15 +177,11 @@ const signUp: React.FC = () => {
                                 />
                                 <TouchableOpacity
                                     onPress={() =>
-                                        setIsPasswordVisible(!isPasswordVisible)
+                                        setIsPassVisible(!isPassVisible)
                                     }
                                 >
                                     <Feather
-                                        name={
-                                            isPasswordVisible
-                                                ? "eye"
-                                                : "eye-off"
-                                        }
+                                        name={isPassVisible ? "eye" : "eye-off"}
                                         size={20}
                                         color="rgb(200, 200, 200)"
                                     />
@@ -161,9 +190,9 @@ const signUp: React.FC = () => {
 
                             <InputRegister
                                 placeholder="Masukkan ulang kata"
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                                secure={!isPasswordVisible2}
+                                value={confirmPass}
+                                onChangeText={setConfirmPass}
+                                secure={!isPassVisible2}
                             >
                                 <Feather
                                     name="lock"
@@ -173,16 +202,12 @@ const signUp: React.FC = () => {
                                 />
                                 <TouchableOpacity
                                     onPress={() =>
-                                        setIsPasswordVisible2(
-                                            !isPasswordVisible2
-                                        )
+                                        setIsPassVisible2(!isPassVisible2)
                                     }
                                 >
                                     <Feather
                                         name={
-                                            isPasswordVisible2
-                                                ? "eye"
-                                                : "eye-off"
+                                            isPassVisible2 ? "eye" : "eye-off"
                                         }
                                         size={20}
                                         color="rgb(200, 200, 200)"
@@ -191,36 +216,51 @@ const signUp: React.FC = () => {
                             </InputRegister>
 
                             {role === "officer" && (
-                                <InputRegister
-                                    placeholder="KTP"
-                                    secure={!isPasswordVisible3}
-                                    value={KTP}
-                                    onChangeText={setKTP}
-                                >
-                                    <AntDesign
-                                        name="idcard"
-                                        size={25}
-                                        color="rgb(202, 202, 202)"
-                                        className="pr-3"
-                                    />
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            setIsPasswordVisible3(
-                                                !isPasswordVisible3
-                                            )
-                                        }
+                                <>
+                                    <InputRegister
+                                        placeholder="KTP"
+                                        secure={!isPassVisible3}
+                                        value={KTP}
+                                        onChangeText={setKTP}
                                     >
-                                        <Feather
-                                            name={
-                                                isPasswordVisible3
-                                                    ? "eye"
-                                                    : "eye-off"
-                                            }
-                                            size={20}
-                                            color="rgb(200, 200, 200)"
+                                        <AntDesign
+                                            name="idcard"
+                                            size={25}
+                                            color="rgb(202, 202, 202)"
+                                            className="pr-3"
                                         />
-                                    </TouchableOpacity>
-                                </InputRegister>
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                setIsPassVisible3(
+                                                    !isPassVisible3
+                                                )
+                                            }
+                                        >
+                                            <Feather
+                                                name={
+                                                    isPassVisible3
+                                                        ? "eye"
+                                                        : "eye-off"
+                                                }
+                                                size={20}
+                                                color="rgb(200, 200, 200)"
+                                            />
+                                        </TouchableOpacity>
+                                    </InputRegister>
+
+                                    <InputRegister
+                                        placeholder="Lokasi"
+                                        value={location}
+                                        onChangeText={setLocation}
+                                    >
+                                        <SimpleLineIcons
+                                            name="location-pin"
+                                            size={25}
+                                            color="rgb(200, 200, 200)"
+                                            className="pr-3"
+                                        />
+                                    </InputRegister>
+                                </>
                             )}
                         </View>
 

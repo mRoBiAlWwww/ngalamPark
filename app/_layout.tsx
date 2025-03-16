@@ -4,8 +4,10 @@ import React, { useEffect } from "react";
 import "../global.css";
 import { StatusBar } from "react-native";
 import * as Font from "expo-font";
+import store, { persistor } from "../redux/store";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-
 import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
@@ -31,16 +33,18 @@ const RootLayout: React.FC = () => {
 
     return (
         // <KeyboardProvider>
-        <>
-            <StatusBar barStyle="dark-content" />
-            <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(user)" />
-                <Stack.Screen name="(officer)" />
-                <Stack.Screen name="(auth)" />
-                <Stack.Screen name="index" />
-            </Stack>
-            <Toast />
-        </>
+        <Provider store={store}>
+            <PersistGate persistor={persistor}>
+                <StatusBar barStyle="dark-content" />
+                <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(user)" />
+                    <Stack.Screen name="(officer)" />
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="index" />
+                </Stack>
+                <Toast />
+            </PersistGate>
+        </Provider>
         // </KeyboardProvider>
     );
 };

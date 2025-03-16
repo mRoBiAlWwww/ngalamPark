@@ -8,13 +8,17 @@ import FAQ from "../../../assets/images/ChatsCircle.svg";
 import Help from "../../../assets/images/Question.svg";
 import Pencil from "../../../assets/images/PencilSimpleLine.svg";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { resetUserAccount } from "../../../redux/slice/userAccountSlice";
+import { useDispatch } from "react-redux";
 
 const profile: React.FC = () => {
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const handleSignOut = async () => {
         try {
             await signOut(FIREBASE_AUTH);
+            dispatch(resetUserAccount());
             router.replace("/(auth)/defaultPage");
         } catch (error) {
             console.error("Error saat sign out:", error);

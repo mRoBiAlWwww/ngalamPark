@@ -1,19 +1,35 @@
-import { Button, Text, View, TextInput, Alert } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../redux/store";
+import useDatabase from "../../../../hooks/useCreate";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import InputRegister from "../../../../components/InputRegister";
+import ButtonRegister from "../../../../components/ButtonRegister";
+import { TouchableOpacity } from "react-native";
 
 const Kendaraan = () => {
     const router = useRouter();
+    const account = useSelector((state: RootState) => state.userAccount);
+    const { saveData } = useDatabase();
 
     const [plateNumber, setPlateNumber] = useState("");
     const [vehicleType, setVehicleType] = useState("");
+    const [stnk, setStnk] = useState("");
 
-    console.log("berhasil");
+    const showToast = (message: string) => {
+        Toast.show({
+            type: "error",
+            text1: message,
+        });
+    };
 
     const saveVehicleData = async () => {
         if (!plateNumber || !vehicleType) {
-            Alert.alert("Error", "Harap isi semua field!");
+            showToast("Error, Harap isi semua field!");
             return;
         }
         try {
@@ -26,46 +42,63 @@ const Kendaraan = () => {
                 "vehicleData",
                 JSON.stringify(vehicleData)
             );
-            Alert.alert("Sukses", "Data kendaraan berhasil disimpan!");
+
+            const userData: Record<string, any> = {
+                plateNumber,
+                vehicleType,
+                timestamp: new Date().toISOString(),
+            };
+            await saveData("vehicle/" + account.id, userData);
+
+            router.back();
+            showToast("Sukses, Data kendaraan berhasil disimpan!");
         } catch (error: unknown) {
             if (error instanceof Error) {
-                Alert.alert("Error", "Gagal menyimpan data: " + error.message);
+                showToast("Error, Gagal menyimpan data: " + error.message);
             } else {
-                Alert.alert("Error", "Gagal menyimpan data: " + String(error));
+                showToast("Error, Gagal menyimpan data: " + String(error));
             }
         }
     };
 
     return (
-        <View className="flex items-center bg-white h-full">
-            <Text className="font-maison text-3xl mt-36 mb-10 text-black">
-                Daftar Kendaraan
-            </Text>
-            <View className="w-4/5 p-5 border-2 border-primary rounded-3xl">
-                <View className="mb-5 flex">
-                    <Text className="text-2xl font-bold mb-4">
-                        Input Data Kendaraan
-                    </Text>
-
-                    <Text className="text-lg mb-2">Nomor Plat:</Text>
-                    <TextInput
-                        className="border border-gray-300 p-2 mb-4 rounded"
+        <View className="flex items-center bg-defaultBackground h-full">
+            <View className="flex-row mt-28 mb-20 gap-5 w-full px-10">
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Ionicons
+                        name="arrow-back-circle-outline"
+                        size={35}
+                        color="black"
+                    />
+                </TouchableOpacity>
+                <Text className="font-maison text-3xl mt-1 text-black">
+                    Kendaraan Anda
+                </Text>
+            </View>
+            <View className="w-4/5 p-5 border-2 border-primary bg-white rounded-3xl">
+                <View className="flex py-5 gap-5">
+                    <InputRegister
+                        placeholder="Plat No. Kendaraan"
                         value={plateNumber}
                         onChangeText={setPlateNumber}
-                        placeholder="Masukkan nomor plat (contoh: B 1234 XYZ)"
                     />
-
-                    <Text className="text-lg mb-2">Jenis Kendaraan:</Text>
-                    <TextInput
-                        className="border border-gray-300 p-2 mb-4 rounded"
+                    <InputRegister
+                        placeholder="Brand"
                         value={vehicleType}
                         onChangeText={setVehicleType}
-                        placeholder="Masukkan jenis kendaraan (contoh: Mobil)"
+                    />
+                    <InputRegister
+                        placeholder="Nomor STNK"
+                        value={stnk}
+                        onChangeText={setStnk}
                     />
 
-                    <Button
-                        title="Simpan Data Kendaraan"
+                    <ButtonRegister
+                        title="Simpan"
                         onPress={saveVehicleData}
+                        componentStyle="px-5 py-3 rounded-full font-bold flex justify-center items-center w-full mx-auto overflow-hidden "
+                        textStyle="text-white text-lg font-custom"
+                        colors={["#33D3F8", "#1B859D"]}
                     />
                 </View>
             </View>
