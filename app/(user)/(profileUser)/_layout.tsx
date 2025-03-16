@@ -8,7 +8,7 @@ const ProfileLayout = () => {
             <StatusBar barStyle="dark-content" />
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="profileUser" />
-                <Stack.Screen name="profile/(vehicle)/kendaraan" />
+                <Stack.Screen name="(vehicle)" />
             </Stack>
         </>
     );

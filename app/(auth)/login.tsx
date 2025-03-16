@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../lib/firebaseconfig";
+import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
 import ButtonRegister from "../../components/ButtonRegister";
 import Input from "../../components/Input";
-import { doc, getDoc } from "firebase/firestore";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useDispatch } from "react-redux";
 import { ProgressBar } from "react-native-paper";
 import Toast from "react-native-toast-message";
+import { get, getDatabase, ref } from "firebase/database";
+import { setUserAccount } from "../../redux/slice/userAccountSlice";
+import { setOfficerAccount } from "../../redux/slice/officerAccountSlice";
+import React from "react";
 
 export default function Login() {
     const router = useRouter();
@@ -18,6 +22,8 @@ export default function Login() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
+    const dispatch = useDispatch();
+    const db = getDatabase();
 
     const showToast = (message: string) => {
         Toast.show({
@@ -39,12 +45,35 @@ export default function Login() {
                 showToast("Verifikasi email terlebih dahulu.");
                 return;
             }
-            const userDoc = await getDoc(
-                doc(FIREBASE_DB, "users", userCredential.user.uid)
+
+            const userSnapshot = await get(
+                ref(db, "users/" + userCredential.user.uid)
             );
-            userDoc.data()?.role == "user"
-                ? router.replace("/homeUser")
-                : router.replace("/homeOfficer");
+            if (userSnapshot.exists()) {
+                dispatch(
+                    setUserAccount({
+                        callNumber: userSnapshot.val().callNumber,
+                        id: userSnapshot.val().id,
+                        name: userSnapshot.val().name,
+                        role: userSnapshot.val().role,
+                        saldo: userSnapshot.val().saldo,
+                    })
+                );
+                router.replace("/homeUser");
+            } else {
+                const officerSnapshot = await get(
+                    ref(db, "officer/" + userCredential.user.uid)
+                );
+                dispatch(
+                    setOfficerAccount({
+                        callNumber: officerSnapshot.val().callNumber,
+                        id: officerSnapshot.val().id,
+                        name: officerSnapshot.val().name,
+                        role: officerSnapshot.val().role,
+                    })
+                );
+                router.replace("/homeOfficer");
+            }
         } catch (err: any) {
             console.log("Firebase Error Code:", err.code);
             if (err.code === "auth/invalid-credential") {

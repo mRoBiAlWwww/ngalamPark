@@ -7,7 +7,7 @@ interface InputDataProps {
     secure?: boolean;
     value: string;
     onChangeText: (text: string) => void;
-    children: ReactNode;
+    children?: ReactNode;
     className?: string;
 }
 
