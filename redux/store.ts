@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userAccountReducer from "./slice/userAccountSlice";
 import officerAccountReducer from "./slice/officerAccountSlice";
+
 import {
     persistStore,
     persistReducer,

@@ -10,22 +10,25 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import InputRegister from "../../../../components/InputRegister";
 import ButtonRegister from "../../../../components/ButtonRegister";
 import { TouchableOpacity } from "react-native";
+import { getDatabase, ref, set } from "firebase/database";
+import { FIREBASE_APP } from "@/lib/firebaseconfig";
+
+const showToast = (message: string) => {
+    Toast.show({
+        type: "error",
+        text1: message,
+    });
+};
 
 const Kendaraan = () => {
     const router = useRouter();
     const account = useSelector((state: RootState) => state.userAccount);
+    const db = getDatabase(FIREBASE_APP);
     const { saveData } = useDatabase();
 
-    const [plateNumber, setPlateNumber] = useState("");
-    const [vehicleType, setVehicleType] = useState("");
-    const [stnk, setStnk] = useState("");
-
-    const showToast = (message: string) => {
-        Toast.show({
-            type: "error",
-            text1: message,
-        });
-    };
+    const [plateNumber, setPlateNumber] = useState<string>("");
+    const [vehicleType, setVehicleType] = useState<string>("");
+    const [stnk, setStnk] = useState<string>("");
 
     const saveVehicleData = async () => {
         if (!plateNumber || !vehicleType) {
@@ -43,15 +46,21 @@ const Kendaraan = () => {
                 JSON.stringify(vehicleData)
             );
 
-            const userData: Record<string, any> = {
+            // const userData: Record<string, any> = {
+            //     plateNumber,
+            //     vehicleType,
+            //     timestamp: new Date().toISOString(),
+            // };
+
+            await set(ref(db, "vehicle/" + account.id), {
                 plateNumber,
                 vehicleType,
                 timestamp: new Date().toISOString(),
-            };
-            await saveData("vehicle/" + account.id, userData);
+            });
+            // await saveData("vehicle/" + account.id, userData);
 
-            router.back();
             showToast("Sukses, Data kendaraan berhasil disimpan!");
+            router.back();
         } catch (error: unknown) {
             if (error instanceof Error) {
                 showToast("Error, Gagal menyimpan data: " + error.message);
@@ -63,12 +72,15 @@ const Kendaraan = () => {
 
     return (
         <View className="flex items-center bg-defaultBackground h-full">
-            <View className="flex-row mt-28 mb-20 gap-5 w-full px-10">
-                <TouchableOpacity onPress={() => router.back()}>
+            <View className="flex-row mt-28 mb-20 gap-5 px-10 relative -left-5">
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="self-start relative -left-14"
+                >
                     <Ionicons
                         name="arrow-back-circle-outline"
                         size={35}
-                        color="black"
+                        color="#01aed6"
                     />
                 </TouchableOpacity>
                 <Text className="font-maison text-3xl mt-1 text-black">

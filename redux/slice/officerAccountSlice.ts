@@ -5,6 +5,7 @@ interface officerAccountState {
     id: string;
     name: string;
     role: string;
+    location: string;
 }
 
 const initialState: officerAccountState = {
@@ -12,6 +13,7 @@ const initialState: officerAccountState = {
     id: "",
     name: "",
     role: "",
+    location: "",
 };
 
 const officerAccountSlice = createSlice({
@@ -23,6 +25,7 @@ const officerAccountSlice = createSlice({
             state.id = action.payload.id;
             state.name = action.payload.name;
             state.role = action.payload.role;
+            state.location = action.payload.location;
         },
     },
 });

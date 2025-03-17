@@ -9,6 +9,7 @@ interface userAccountState {
         ovo: number;
         shopeepay: number;
     };
+    PIN: string;
 }
 
 const initialState: userAccountState = {
@@ -20,6 +21,7 @@ const initialState: userAccountState = {
         ovo: 0,
         shopeepay: 0,
     },
+    PIN: "",
 };
 
 const userAccountSlice = createSlice({

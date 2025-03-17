@@ -43,7 +43,9 @@ const profile: React.FC = () => {
                                 rasyaafrz@student.ub.ac.id
                             </Text>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => router.push("/editProfile")}
+                        >
                             <Pencil />
                         </TouchableOpacity>
                     </View>
@@ -55,7 +57,9 @@ const profile: React.FC = () => {
                     <View className="flex-row justify-between border-b-2 border-gray-300 mb-3 items-center">
                         <View className="flex-row gap-3 py-2 items-center mb-2">
                             <Lock />
-                            <TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => router.push("/PIN")}
+                            >
                                 <Text className="font-work">Ubah PIN</Text>
                             </TouchableOpacity>
                         </View>

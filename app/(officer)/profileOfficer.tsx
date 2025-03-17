@@ -9,7 +9,7 @@ import { RootState } from "@/redux/store";
 
 const profileOfficer: React.FC = () => {
     const router = useRouter();
-    const account = useSelector((state: RootState) => state.account);
+    const account = useSelector((state: RootState) => state.userAccount);
     const handleSignOut = async (): Promise<void> => {
         try {
             await signOut(FIREBASE_AUTH);

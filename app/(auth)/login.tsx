@@ -57,6 +57,7 @@ export default function Login() {
                         name: userSnapshot.val().name,
                         role: userSnapshot.val().role,
                         saldo: userSnapshot.val().saldo,
+                        PIN: "",
                     })
                 );
                 router.replace("/homeUser");
@@ -70,6 +71,7 @@ export default function Login() {
                         id: officerSnapshot.val().id,
                         name: officerSnapshot.val().name,
                         role: officerSnapshot.val().role,
+                        location: officerSnapshot.val().location,
                     })
                 );
                 router.replace("/homeOfficer");
