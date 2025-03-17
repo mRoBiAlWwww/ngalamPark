@@ -1,5 +1,5 @@
-import { router, usePathname } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, usePathname, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
     BackHandler,
     Image,
@@ -8,8 +8,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    ScrollView,
     FlatList,
+    ScrollView,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Feather from "@expo/vector-icons/Feather";
@@ -19,7 +19,7 @@ import Shopee from "../../../assets/images/dummyShopeepay.svg";
 import Ovo from "../../../assets/images/ovo2.svg";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
-import { get, getDatabase, ref } from "firebase/database";
+import { get, getDatabase, onValue, ref } from "firebase/database";
 import Toast from "react-native-toast-message";
 
 const formatRupiah = (amount: number) => {
@@ -52,13 +52,13 @@ const homeUser: React.FC = () => {
     const [ewallet, setEwallet] = useState<string>("ovo");
     const [search, setSearch] = useState<string>("");
     const [searchResult, setSearchResult] = useState<ParkData[]>([]);
-
+    const [listFavorite, setListFavorite] = useState<ParkData[]>([]);
     const db = getDatabase();
+    const account = useSelector((state: RootState) => state.userAccount);
 
     const renderItem = ({ item }: { item: ParkData }) => (
         <TouchableOpacity
             onPress={() => {
-                console.log(item.id);
                 router.push(`/${item.id}`);
             }}
             className="bg-white border-[1px] border-gray-300 rounded-2xl p-3 gap-2 flex-row my-2"
@@ -75,7 +75,7 @@ const homeUser: React.FC = () => {
                     <FontAwesome6 name="location-dot" size={20} color="black" />
                     <Text className="font-work text-sm">{item.address}</Text>
                 </View>
-                <View className="flex-row gap-3 mb-2">
+                <View className="flex-row gap-2 mb-2">
                     <AntDesign name="contacts" size={20} color="black" />
                     <Text className="font-work text-sm">{item.officer}</Text>
                 </View>
@@ -83,6 +83,64 @@ const homeUser: React.FC = () => {
             </View>
         </TouchableOpacity>
     );
+
+    const handleSearch = async (input: string) => {
+        try {
+            const snapshot = await get(ref(db, "parkLocation"));
+            if (snapshot.exists()) {
+                const parks = snapshot.val();
+                const results: ParkData[] = [];
+
+                for (let parkId in parks) {
+                    if (
+                        parks[parkId].name
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
+                    ) {
+                        const result: ParkData = {
+                            id: parkId,
+                            ...parks[parkId],
+                        };
+                        results.push(result);
+                    }
+                }
+                setSearchResult(results);
+            }
+        } catch (error: any) {
+            console.error("Error fetching data:", error);
+            showToast(error.message);
+        }
+    };
+
+    const getFavorite = (accountId: string) => {
+        const unsubscribe = onValue(
+            ref(db, "favorites/" + accountId),
+            (snapshot) => {
+                if (snapshot.exists()) {
+                    const favoriteNames = Object.keys(snapshot.val());
+
+                    Promise.all(
+                        favoriteNames.map(async (name) => {
+                            const locationSnapshot = await get(
+                                ref(db, "parkLocation/" + name)
+                            );
+                            return locationSnapshot.exists()
+                                ? { id: name, ...locationSnapshot.val() }
+                                : null;
+                        })
+                    ).then((favoriteDetails) => {
+                        setListFavorite(
+                            favoriteDetails.filter((item) => item !== null)
+                        );
+                    });
+                } else {
+                    setListFavorite([]);
+                }
+            }
+        );
+
+        return unsubscribe;
+    };
 
     useEffect(() => {
         const backAction = () => {
@@ -99,42 +157,16 @@ const homeUser: React.FC = () => {
         return () => backHandler.remove();
     }, [pathname]);
 
-    const handleSearch = async (input: string) => {
-        try {
-            const snapshot = await get(ref(db, "parkLocation"));
-            if (snapshot.exists()) {
-                const parks = snapshot.val();
-                const results: ParkData[] = []; // Gunakan array untuk menampung hasil
-
-                for (let parkId in parks) {
-                    if (
-                        parks[parkId].name
-                            .toLowerCase()
-                            .includes(input.toLowerCase())
-                    ) {
-                        const result: ParkData = {
-                            id: parkId,
-                            ...parks[parkId],
-                        };
-                        results.push(result);
-                    }
-                }
-                setSearchResult(results);
-            } else {
-                console.log("No data available");
-            }
-        } catch (error: any) {
-            console.error("Error fetching data:", error);
-            showToast(error.message);
-        }
-    };
-
     useEffect(() => {
         handleSearch(search);
     }, [search]);
 
-    const account = useSelector((state: RootState) => state.userAccount);
-
+    useFocusEffect(
+        useCallback(() => {
+            const unsubscribe = getFavorite(account.id);
+            return () => unsubscribe();
+        }, [account.id])
+    );
     return (
         <>
             <StatusBar
@@ -221,86 +253,74 @@ const homeUser: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View className="bg-white rounded-2xl w-[90%] mx-auto flex-row border-[1px] border-gray-300 px-6 py-2 absolute right-6 top-[160px] items-center">
-                        <Feather name="search" size={24} color="black" />
-                        <TextInput
-                            value={search}
-                            onChangeText={setSearch}
-                            className="ml-4"
-                            placeholder="Cari lokasi parkirmu disini "
-                            style={{ fontFamily: "WorkSans" }}
-                        />
+                    <View className="bg-white rounded-2xl w-[90%] mx-auto flex-row border-[1px] border-gray-300 px-6 py-2 absolute right-6 top-[160px] items-center justify-between z-40">
+                        <View className="flex-row items-center">
+                            <Feather name="search" size={24} color="black" />
+                            <TextInput
+                                value={search}
+                                onChangeText={setSearch}
+                                className="ml-4"
+                                placeholder="Cari lokasi parkirmu disini "
+                                style={{ fontFamily: "WorkSans" }}
+                            />
+                        </View>
+                        {search && (
+                            <TouchableOpacity onPress={() => setSearch("")}>
+                                <AntDesign
+                                    name="close"
+                                    size={24}
+                                    color="gray"
+                                />
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
-                {search ? (
-                    <View className="pt-12 px-6">
-                        <Text className="font-workSemiBold text-2xl">
-                            Hasil Pencarian
-                        </Text>
-                        {searchResult &&
-                        Array.isArray(searchResult) &&
-                        searchResult.length > 0 ? (
+                {search && searchResult ? (
+                    <FlatList
+                        data={searchResult}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) =>
+                            item.id ? item.id : `${index}`
+                        }
+                        ListHeaderComponent={
+                            <View className="pt-12 px-6">
+                                <Text className="font-workSemiBold text-2xl">
+                                    Hasil Pencarian
+                                </Text>
+                            </View>
+                        }
+                        contentContainerStyle={{
+                            paddingHorizontal: 21,
+                            paddingBottom: 120,
+                        }}
+                        showsVerticalScrollIndicator={false}
+                    />
+                ) : (
+                    <ScrollView keyboardShouldPersistTaps="handled">
+                        {listFavorite.length > 0 ? (
                             <FlatList
-                                data={searchResult} // Gunakan searchResult langsung tanpa Object.values
+                                data={listFavorite}
                                 renderItem={renderItem}
                                 keyExtractor={(item, index) =>
                                     item.id ? item.id : `${index}`
                                 }
+                                ListHeaderComponent={
+                                    <View className="pt-12">
+                                        <Text className="font-workSemiBold text-2xl">
+                                            Favorite
+                                        </Text>
+                                    </View>
+                                }
+                                contentContainerStyle={{
+                                    paddingHorizontal: 21,
+                                    paddingBottom: 10,
+                                }}
+                                showsVerticalScrollIndicator={false}
+                                scrollEnabled={false}
                             />
                         ) : null}
-                    </View>
-                ) : (
-                    <ScrollView
-                        className="pt-12 px-6"
-                        contentContainerStyle={{ paddingBottom: 180 }}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        <View className="mb-10">
-                            <Text className="font-workSemiBold text-2xl">
-                                Favorit
-                            </Text>
-                            {/* pake flatlist */}
-                            <View className="bg-white border-[1px] border-gray-300 rounded-2xl p-3 gap-2 flex-row my-2">
-                                <View className="w-1/4 mt-2">
-                                    <Image
-                                        className="w-24 h-40 rounded-lg "
-                                        source={require("../../../assets/images/dummyBento.png")}
-                                    />
-                                </View>
-                                <View className="w-3/4 flex gap-1 px-2">
-                                    <Text className="font-workSemiBold text-lg">
-                                        Bento Kopi UIN Malang
-                                    </Text>
-                                    <View className="flex-row gap-3 ml-1">
-                                        <FontAwesome6
-                                            name="location-dot"
-                                            size={20}
-                                            color="black"
-                                        />
-                                        <Text className="font-work text-sm">
-                                            Dinoyo, Lowokwaru, Malang.
-                                        </Text>
-                                    </View>
-                                    <View className="flex-row gap-3 mb-2">
-                                        <AntDesign
-                                            name="contacts"
-                                            size={20}
-                                            color="black"
-                                        />
-                                        <Text className="font-work text-sm">
-                                            Bapak Suryanto
-                                        </Text>
-                                    </View>
-                                    <Text className="font-work text-sm">
-                                        Tempatnya bagus banget dan luas, petugas
-                                        parkirnya ramah - ramah. Dengan tempat
-                                        parkir yang luas sangat memudahkan
-                                        sekali.
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                        <View className="flex-row gap-2 ">
+
+                        <View className="flex-row gap-2 px-6 mt-10 ">
                             <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
                                 <View className="h-32">
                                     <Image
@@ -347,3 +367,96 @@ const homeUser: React.FC = () => {
     );
 };
 export default homeUser;
+
+// const getFavorite = async () => {
+//     try {
+//         const favoritesSnapshot = await get(
+//             ref(db, "favorites/" + account.id)
+//         );
+//         if (favoritesSnapshot.exists()) {
+//             const favoriteNames = Object.keys(favoritesSnapshot.val());
+
+//             const favoriteDetails = await Promise.all(
+//                 favoriteNames.map(async (name) => {
+//                     const locationSnapshot = await get(
+//                         ref(db, "parkLocation/" + name)
+//                     );
+//                     return locationSnapshot.exists()
+//                         ? { id: name, ...locationSnapshot.val() }
+//                         : null;
+//                 })
+//             );
+//             setListFavorite(
+//                 favoriteDetails.filter((item) => item !== null)
+//             );
+//         }
+//     } catch (error: any) {
+//         showToast(error.message);
+//     }
+// };
+
+// ) : listFavorite.length > 0 ? (
+//     <FlatList
+//         data={listFavorite}
+//         renderItem={renderItem}
+//         keyExtractor={(item, index) =>
+//             item.id ? item.id : `${index}`
+//         }
+//         ListHeaderComponent={
+//             <View className="pt-12">
+//                 <Text className="font-workSemiBold text-2xl">
+//                     Favorite
+//                 </Text>
+//             </View>
+//         }
+//         contentContainerStyle={{
+//             paddingHorizontal: 21,
+//             paddingBottom: 120,
+//         }}
+//         showsVerticalScrollIndicator={false}
+//     />
+// ) : (
+//     <View className="my-44">
+//         <Text className="font-work">
+//             Anda belum memiliki daftar favorit
+//         </Text>
+//     </View>
+// )}
+// <View className="flex-row gap-2 ">
+//     <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
+//         <View className="h-32">
+//             <Image
+//                 className="w-full h-full"
+//                 source={require("../../../assets/images/dummyPujas.jpg")}
+//             />
+//         </View>
+//         <View className="gap-2 p-4">
+//             <Text className="font-workSemiBold text">
+//                 Bento Kopi UIN Malang
+//             </Text>
+//             <Text className="font-work text-sm">
+//                 Tempatnya bagus banget dan luas, petugas
+//                 parkirnya ramah - ramah. Dengan tempat parkir
+//                 yang luas sangat memudahkan sekali.
+//             </Text>
+//         </View>
+//     </View>
+//     <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
+//         <View className="h-32">
+//             <Image
+//                 className="w-full h-full"
+//                 source={require("../../../assets/images/dummyPujas.jpg")}
+//             />
+//         </View>
+//         <View className="gap-2 p-4">
+//             <Text className="font-workSemiBold text">
+//                 Bento Kopi UIN Malang
+//             </Text>
+//             <Text className="font-work text-sm">
+//                 Tempatnya bagus banget dan luas, petugas
+//                 parkirnya ramah - ramah. Dengan tempat parkir
+//                 yang luas sangat memudahkan sekali.
+//             </Text>
+//         </View>
+//     </View>
+// </View>

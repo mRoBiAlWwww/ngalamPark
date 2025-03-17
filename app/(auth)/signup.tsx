@@ -11,7 +11,7 @@ import {
     sendEmailVerification,
     createUserWithEmailAndPassword,
 } from "firebase/auth";
-import { FIREBASE_AUTH } from "../../lib/firebaseconfig";
+import { FIREBASE_AUTH, FIREBASE_APP } from "../../lib/firebaseconfig";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -20,6 +20,7 @@ import Button from "../../components/ButtonRegister";
 import InputRegister from "../../components/InputRegister";
 import Toast from "react-native-toast-message";
 import useDatabase from "../../hooks/useCreate";
+import { getDatabase, ref, set } from "firebase/database";
 type Role = "user" | "officer";
 
 const signUp: React.FC = () => {
@@ -35,7 +36,8 @@ const signUp: React.FC = () => {
     const [isPassVisible3, setIsPassVisible3] = useState<boolean>(false);
     const { role } = useLocalSearchParams<{ role: Role }>();
     const router = useRouter();
-    const { saveData } = useDatabase();
+    const db = getDatabase(FIREBASE_APP);
+    // const { saveData } = useDatabase();
 
     const showToast = (message: string) => {
         Toast.show({
@@ -70,27 +72,39 @@ const signUp: React.FC = () => {
 
             const uid = userCredential.user.uid;
             if (role === "user") {
-                const userData: Record<string, any> = {
-                    id: uid,
-                    name,
-                    callNumber,
-                    role,
-                    saldo: {
-                        ovo: 800000,
-                        shopeepay: 100000,
-                    },
-                };
-                await saveData("users/" + uid, userData);
+                try {
+                    await set(ref(db, "users/" + uid), {
+                        id: uid,
+                        name,
+                        callNumber,
+                        role,
+                        saldo: {
+                            ovo: 800000,
+                            shopeepay: 100000,
+                        },
+                        PIN: "",
+                    });
+                    console.log("Data berhasil ditambahkan");
+                } catch (error: any) {
+                    showToast(error.message);
+                }
+
+                // await saveData("users/" + uid, userData);
             } else {
-                const userData: Record<string, any> = {
-                    id: uid,
-                    name,
-                    callNumber,
-                    ktp: KTP,
-                    role,
-                    location,
-                };
-                await saveData("officer/" + uid, userData);
+                try {
+                    await set(ref(db, "officer/" + uid), {
+                        id: uid,
+                        name,
+                        callNumber,
+                        ktp: KTP,
+                        role,
+                        location,
+                    });
+                    console.log("Data berhasil ditambahkan");
+                } catch (error: any) {
+                    showToast(error.message);
+                }
+                // await saveData("officer/" + uid, userData);
             }
             await sendEmailVerification(userCredential.user);
             router.replace("/(auth)/login");
