@@ -19,7 +19,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Button from "../../components/ButtonRegister";
 import InputRegister from "../../components/InputRegister";
 import Toast from "react-native-toast-message";
-import useDatabase from "../../hooks/useCreate";
 import { getDatabase, ref, set } from "firebase/database";
 type Role = "user" | "officer";
 
@@ -37,7 +36,6 @@ const signUp: React.FC = () => {
     const { role } = useLocalSearchParams<{ role: Role }>();
     const router = useRouter();
     const db = getDatabase(FIREBASE_APP);
-    // const { saveData } = useDatabase();
 
     const showToast = (message: string) => {
         Toast.show({
@@ -76,13 +74,16 @@ const signUp: React.FC = () => {
                     await set(ref(db, "users/" + uid), {
                         id: uid,
                         name,
+                        email,
                         callNumber,
                         role,
                         saldo: {
-                            ovo: 800000,
+                            ovo: 100000,
                             shopeepay: 100000,
+                            coin: 0,
                         },
                         PIN: "",
+                        booking: "",
                     });
                     console.log("Data berhasil ditambahkan");
                 } catch (error: any) {
@@ -99,6 +100,7 @@ const signUp: React.FC = () => {
                         ktp: KTP,
                         role,
                         location,
+                        saldo: 0,
                     });
                     console.log("Data berhasil ditambahkan");
                 } catch (error: any) {

@@ -62,7 +62,7 @@ export default function TabLayout() {
             />
             <Tabs.Screen name="qrPage" />
             <Tabs.Screen
-                name="smartPark"
+                name="(smartpark)"
                 options={{
                     title: "SmartPark",
                     tabBarIcon: ({ focused }) => (
@@ -101,31 +101,4 @@ export default function TabLayout() {
             />
         </Tabs>
     );
-}
-{
-    /* <Tabs.Screen
-                name="homeUser"
-                options={{
-                    title: "Beranda",
-                    tabBarIcon: ({ focused }) => (
-                        <View>
-                            {focused ? (
-                                <LinearGradient
-                                    colors={["#01aed6", "#0189a7"]}
-                                    style={{
-                                        flex: 1,
-                                        justifyContent: "flex-start",
-                                        alignItems: "center",
-                                    }}
-                                />
-                            ) : null}
-                            <Entypo
-                                name="home"
-                                size={25}
-                                color={focused ? "#01aed6" : "#3A3131"}
-                            />
-                        </View>
-                    ),
-                }} 
-            /> */
 }

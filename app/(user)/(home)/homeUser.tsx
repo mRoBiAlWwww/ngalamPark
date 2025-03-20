@@ -29,7 +29,7 @@ const formatRupiah = (amount: number) => {
     }).format(amount);
 };
 
-interface ParkData {
+export interface ParkData {
     id: string;
     address: string;
     name: string;
@@ -37,6 +37,11 @@ interface ParkData {
     rate: number;
     review: string;
     slot: number;
+}
+export interface Nominal {
+    ovo: number;
+    shopeepay: number;
+    coin: number;
 }
 
 const showToast = (message: string) => {
@@ -50,6 +55,11 @@ const homeUser: React.FC = () => {
     const pathname = usePathname();
     const [showSaldo, setShowSaldo] = useState<boolean>(false);
     const [ewallet, setEwallet] = useState<string>("ovo");
+    const [nominal, setNominal] = useState<Nominal>({
+        ovo: 0,
+        shopeepay: 0,
+        coin: 0,
+    });
     const [search, setSearch] = useState<string>("");
     const [searchResult, setSearchResult] = useState<ParkData[]>([]);
     const [listFavorite, setListFavorite] = useState<ParkData[]>([]);
@@ -107,7 +117,6 @@ const homeUser: React.FC = () => {
                 setSearchResult(results);
             }
         } catch (error: any) {
-            console.error("Error fetching data:", error);
             showToast(error.message);
         }
     };
@@ -161,6 +170,18 @@ const homeUser: React.FC = () => {
         handleSearch(search);
     }, [search]);
 
+    useEffect(() => {
+        const unsubscribe = onValue(
+            ref(db, "users/" + account.id + "/saldo"),
+            (snapshot) => {
+                if (snapshot.exists()) {
+                    setNominal(snapshot.val());
+                }
+            }
+        );
+        return () => unsubscribe();
+    }, []);
+
     useFocusEffect(
         useCallback(() => {
             const unsubscribe = getFavorite(account.id);
@@ -176,10 +197,10 @@ const homeUser: React.FC = () => {
             <View className="bg-defaultBackground mb-20 relative">
                 {showSaldo && (
                     <View
-                        className="absolute inset-0 z-40 flex justify-center items-center"
+                        className="absolute inset-0 z-40 flex justify-center items-center h-screen"
                         style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
                     >
-                        <View className="bg-slate-900 w-4/5 h-1/4 p-4 rounded-3xl shadow-lg flex justify-center items-center px-8">
+                        <View className="bg-primary w-4/5 h-1/4 p-4 rounded-3xl shadow-lg flex justify-center items-center px-8">
                             <View className="w-full gap-3">
                                 <TouchableOpacity
                                     className="flex-row justify-between items-center px-5 bg-white rounded-2xl"
@@ -190,7 +211,7 @@ const homeUser: React.FC = () => {
                                 >
                                     <Ovo height={64} width={64} />
                                     <Text className="text-purple-800 font-workSemiBold text-lg">
-                                        {formatRupiah(account.saldo.ovo)}
+                                        {formatRupiah(nominal.ovo)}
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -202,7 +223,7 @@ const homeUser: React.FC = () => {
                                 >
                                     <Shopee width={64} height={64} />
                                     <Text className="text-orange-600 font-workSemiBold text-lg">
-                                        {formatRupiah(account.saldo.shopeepay)}
+                                        {formatRupiah(nominal.shopeepay)}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -210,8 +231,8 @@ const homeUser: React.FC = () => {
                     </View>
                 )}
                 <View className="bg-primary rounded-b-3xl relative z-20">
-                    <View className="flex-row justify-around mt-8">
-                        <View>
+                    <View className="flex-row justify-between mt-8 px-6">
+                        <View className="">
                             <Text className="font-workSemiBold text-white text-3xl">
                                 Halo, {account.name} !
                             </Text>
@@ -219,9 +240,15 @@ const homeUser: React.FC = () => {
                                 Ke mana kamu pergi hari ini?
                             </Text>
                         </View>
-                        <Text className="font-work text-white text-xl">
-                            100
-                        </Text>
+                        <View className="flex-row h-1/2 items-center gap-2">
+                            <Image
+                                source={require("../../../assets/images/star.png")}
+                                className="w-5 h-5"
+                            />
+                            <Text className="font-work text-white text-xl">
+                                {nominal.coin}
+                            </Text>
+                        </View>
                     </View>
                     <View className="bg-white rounded-2xl w-[90%] mx-auto flex-row justify-between px-6 mt-3 mb-12">
                         <TouchableOpacity
@@ -239,8 +266,8 @@ const homeUser: React.FC = () => {
                             </Text>
                             <Text className="font-workSemiBold text-xl">
                                 {ewallet == "ovo"
-                                    ? formatRupiah(account.saldo.ovo)
-                                    : formatRupiah(account.saldo.shopeepay)}
+                                    ? formatRupiah(nominal.ovo)
+                                    : formatRupiah(nominal.shopeepay)}
                             </Text>
                             <TouchableOpacity
                                 onPress={() => setShowSaldo(!showSaldo)}
@@ -318,7 +345,13 @@ const homeUser: React.FC = () => {
                                 showsVerticalScrollIndicator={false}
                                 scrollEnabled={false}
                             />
-                        ) : null}
+                        ) : (
+                            <View className="mt-20 mb-10">
+                                <Text className="font-work mx-auto">
+                                    Anda masih belum memiliki daftar favorit
+                                </Text>
+                            </View>
+                        )}
 
                         <View className="flex-row gap-2 px-6 mt-10 ">
                             <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
@@ -367,96 +400,3 @@ const homeUser: React.FC = () => {
     );
 };
 export default homeUser;
-
-// const getFavorite = async () => {
-//     try {
-//         const favoritesSnapshot = await get(
-//             ref(db, "favorites/" + account.id)
-//         );
-//         if (favoritesSnapshot.exists()) {
-//             const favoriteNames = Object.keys(favoritesSnapshot.val());
-
-//             const favoriteDetails = await Promise.all(
-//                 favoriteNames.map(async (name) => {
-//                     const locationSnapshot = await get(
-//                         ref(db, "parkLocation/" + name)
-//                     );
-//                     return locationSnapshot.exists()
-//                         ? { id: name, ...locationSnapshot.val() }
-//                         : null;
-//                 })
-//             );
-//             setListFavorite(
-//                 favoriteDetails.filter((item) => item !== null)
-//             );
-//         }
-//     } catch (error: any) {
-//         showToast(error.message);
-//     }
-// };
-
-// ) : listFavorite.length > 0 ? (
-//     <FlatList
-//         data={listFavorite}
-//         renderItem={renderItem}
-//         keyExtractor={(item, index) =>
-//             item.id ? item.id : `${index}`
-//         }
-//         ListHeaderComponent={
-//             <View className="pt-12">
-//                 <Text className="font-workSemiBold text-2xl">
-//                     Favorite
-//                 </Text>
-//             </View>
-//         }
-//         contentContainerStyle={{
-//             paddingHorizontal: 21,
-//             paddingBottom: 120,
-//         }}
-//         showsVerticalScrollIndicator={false}
-//     />
-// ) : (
-//     <View className="my-44">
-//         <Text className="font-work">
-//             Anda belum memiliki daftar favorit
-//         </Text>
-//     </View>
-// )}
-// <View className="flex-row gap-2 ">
-//     <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
-//         <View className="h-32">
-//             <Image
-//                 className="w-full h-full"
-//                 source={require("../../../assets/images/dummyPujas.jpg")}
-//             />
-//         </View>
-//         <View className="gap-2 p-4">
-//             <Text className="font-workSemiBold text">
-//                 Bento Kopi UIN Malang
-//             </Text>
-//             <Text className="font-work text-sm">
-//                 Tempatnya bagus banget dan luas, petugas
-//                 parkirnya ramah - ramah. Dengan tempat parkir
-//                 yang luas sangat memudahkan sekali.
-//             </Text>
-//         </View>
-//     </View>
-//     <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
-//         <View className="h-32">
-//             <Image
-//                 className="w-full h-full"
-//                 source={require("../../../assets/images/dummyPujas.jpg")}
-//             />
-//         </View>
-//         <View className="gap-2 p-4">
-//             <Text className="font-workSemiBold text">
-//                 Bento Kopi UIN Malang
-//             </Text>
-//             <Text className="font-work text-sm">
-//                 Tempatnya bagus banget dan luas, petugas
-//                 parkirnya ramah - ramah. Dengan tempat parkir
-//                 yang luas sangat memudahkan sekali.
-//             </Text>
-//         </View>
-//     </View>
-// </View>

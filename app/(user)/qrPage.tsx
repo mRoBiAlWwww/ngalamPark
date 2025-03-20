@@ -3,6 +3,8 @@ import { View, Text, StatusBar } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "expo-router";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface VehicleData {
     plateNumber: string;
@@ -12,7 +14,7 @@ interface VehicleData {
 
 const qrPage: React.FC = () => {
     const [vehicleData, setVehicleData] = useState<VehicleData | null>(null);
-
+    const account = useSelector((state: RootState) => state.userAccount);
     useFocusEffect(
         React.useCallback(() => {
             const fetchVehicleData = async () => {
@@ -40,7 +42,7 @@ const qrPage: React.FC = () => {
             <StatusBar barStyle="dark-content" backgroundColor="#01aed6" />
             <View className="p-10 mt-32">
                 <Text className="font-workSemiBold text-black text-3xl">
-                    Rasya Fariz
+                    {account.name}
                 </Text>
                 <Text className="font-work text-black text-justify mt-1">
                     Ini adalah QRCode kamu. Kamu bisa melakukan pembayaran

@@ -29,13 +29,6 @@ export const Button: FC<Props> = ({
         </TouchableOpacity>
     );
 };
-const styles = StyleSheet.create({
-    gradient: {
-        ...StyleSheet.absoluteFillObject, // Memenuhi ukuran parent
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});
 // const styles = StyleSheet.create({
 //     gradient: {
 //         paddingVertical: 12,

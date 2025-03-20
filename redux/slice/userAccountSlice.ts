@@ -1,27 +1,32 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+export interface List {
+    address: string;
+    cost: number;
+    methode: string;
+    officerId: string;
+    platNomor: string;
+    timestamp: string;
+    userName: string;
+    nameLocation: string;
+}
+
 interface userAccountState {
-    callNumber: string;
     id: string;
     name: string;
-    role: string;
-    saldo: {
-        ovo: number;
-        shopeepay: number;
-    };
+    email: string;
     PIN: string;
+    booking: string;
+    // bookingList: List[];
 }
 
 const initialState: userAccountState = {
-    callNumber: "",
     id: "",
     name: "",
-    role: "",
-    saldo: {
-        ovo: 0,
-        shopeepay: 0,
-    },
+    email: "",
     PIN: "",
+    booking: "",
+    // bookingList: [],
 };
 
 const userAccountSlice = createSlice({
@@ -29,11 +34,12 @@ const userAccountSlice = createSlice({
     initialState,
     reducers: {
         setUserAccount(state, action: PayloadAction<userAccountState>) {
-            state.callNumber = action.payload.callNumber;
             state.id = action.payload.id;
             state.name = action.payload.name;
-            state.role = action.payload.role;
-            state.saldo = action.payload.saldo;
+            state.email = action.payload.email;
+            state.PIN = action.payload.PIN;
+            state.booking = action.payload.booking;
+            // state.bookingList = action.payload.bookingList;
         },
         resetUserAccount: () => initialState,
     },

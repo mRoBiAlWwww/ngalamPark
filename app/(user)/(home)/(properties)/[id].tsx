@@ -7,8 +7,6 @@ import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Toast from "react-native-toast-message";
-import FullyHeart from "../../../assets/images/FullyHeart.svg";
-import EmptyHeart from "../../../assets/images/EmptyHeart.svg";
 import { ScrollView } from "react-native";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -109,7 +107,6 @@ const DetailSearch = () => {
             showToast("Item berhasil dihapus dari favorite");
         } catch (error: any) {
             showToast(error.message);
-            showToast(error.message);
         }
     };
 
@@ -124,20 +121,6 @@ const DetailSearch = () => {
             return false;
         }
     };
-
-    // const addOrRemove = async () => {
-    //     const exist = await checkFavorite(account.id, idString);
-    //     if (!exist) {
-    //         if (!isFavorite) {
-    //             addToFavorite(account.id, idString);
-    //         } else {
-    //             removeToFavorite(account.id, idString);
-    //         }
-    //         setIsFavorite(!isFavorite);
-    //     } else {
-    //         showToast("Data sudah ditambahkan di favorite");
-    //     }
-    // };
 
     return (
         <>
@@ -200,7 +183,7 @@ const DetailSearch = () => {
                 <View className="mx-auto mt-5">
                     <Image
                         className="w-96 h-60 rounded-3xl"
-                        source={require("../../../assets/images/dummyPujas.jpg")}
+                        source={require("../../../../assets/images/dummyPujas.jpg")}
                     />
                 </View>
 
