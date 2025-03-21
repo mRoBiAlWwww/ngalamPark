@@ -10,12 +10,11 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { ProgressBar } from "react-native-paper";
 import Toast from "react-native-toast-message";
-import { get, getDatabase, ref } from "firebase/database";
 import { setUserAccount } from "../../redux/slice/userAccountSlice";
 import { setOfficerAccount } from "../../redux/slice/officerAccountSlice";
 import React from "react";
 import { RootState } from "@/redux/store";
-
+import { get, getDatabase, ref } from "firebase/database";
 export default function Login() {
     const router = useRouter();
     const [email, setEmail] = useState<string>("");
@@ -25,7 +24,6 @@ export default function Login() {
     const [progress, setProgress] = useState(0);
     const dispatch = useDispatch();
     const db = getDatabase();
-    const account = useSelector((state: RootState) => state.userAccount);
 
     const showToast = (message: string) => {
         Toast.show({
@@ -59,7 +57,6 @@ export default function Login() {
                         email: userSnapshot.val().email,
                         PIN: userSnapshot.val().PIN,
                         booking: userSnapshot.val().booking,
-                        // bookingList: account.bookingList,
                     })
                 );
                 router.replace("/homeUser");
@@ -67,11 +64,13 @@ export default function Login() {
                 const officerSnapshot = await get(
                     ref(db, "officer/" + userCredential.user.uid)
                 );
+                console.log(officerSnapshot.val().nameLocation);
                 dispatch(
                     setOfficerAccount({
                         id: officerSnapshot.val().id,
                         name: officerSnapshot.val().name,
                         location: officerSnapshot.val().location,
+                        nameLocation: officerSnapshot.val().nameLocation,
                     })
                 );
                 router.replace("/homeOfficer");

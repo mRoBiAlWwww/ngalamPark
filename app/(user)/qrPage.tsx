@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StatusBar, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StatusBar } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "expo-router";
-import { getDatabase, ref, onValue, update, get } from "firebase/database";
-import { FIREBASE_APP } from "@/lib/firebaseconfig";
-import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
-// import { useSelector } from "react-redux";
-// import { RootState } from "@/redux/store";
 
 interface VehicleData {
+    nameLocation: string;
     plateNumber: string;
     vehicleType: string;
     timestamp: string;
@@ -21,8 +16,6 @@ interface VehicleData {
 
 const qrPage = () => {
     const [vehicleData, setVehicleData] = useState<VehicleData | null>(null);
-    const account = useSelector((state: RootState) => state.userAccount);
-    const db = getDatabase(FIREBASE_APP);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -42,57 +35,9 @@ const qrPage = () => {
         }, [])
     );
 
-    // useEffect(() => {
-    //     if (vehicleData?.plateNumber) {
-    //         const vehicleRef = ref(
-    //             db,
-    //             "officerPayment/" + vehicleData. + "/" + account.id
-    //         );
-    //         const unsubscribe = onValue(vehicleRef, async (snapshot) => {
-    //             const data = snapshot.val();
-    //             if (data?.paymentStatus === "insite") {
-    //                 Alert.alert(
-    //                     "Pembayaran Berhasil",
-    //                     `Pembayaran berhasil sebesar Rp2000 dan menambah poin 2`,
-    //                     [{ text: "OK" }]
-    //                 );
-    //                 const getSaldo = await get(
-    //                     ref(db, "users/" + account.id + "/saldo/ovo")
-    //                 );
-
-    //                 update(
-    //                     ref(
-    //                         db,
-    //                         "users/" + account.id + "/" + "saldo"
-    //                     ),
-    //                     {
-    //                         ovo: getSaldo.val() - 2100,
-    //                     }
-    //                 );
-    //                 update(
-    //                     ref(
-    //                         db,
-    //                         "officerPayment/" +
-    //                             officer.id +
-    //                             "/" +
-    //                             account.id
-    //                     ),
-    //                     {
-    //                         paymentStatus: "outsite",
-    //                     }
-    //                 );
-    //             }
-    //         });
-
-    //         return () => unsubscribe();
-    //     }
-    // }, [vehicleData]);
-    console.log("test ", vehicleData);
-
     const qrValue = vehicleData
-        ? `Nomor Plat: ${vehicleData.plateNumber}, Jenis Kendaraan: ${vehicleData.vehicleType}, Waktu: ${vehicleData.timestamp}, Account ID: ${vehicleData.accountId}`
+        ? `Nomor Plat: ${vehicleData.plateNumber}, Jenis Kendaraan: ${vehicleData.vehicleType}, Waktu: ${vehicleData.timestamp}, Account ID: ${vehicleData.accountId},`
         : "Belum ada data kendaraan";
-
     return (
         <View className="flex items-center bg-defaultBackground h-full">
             <StatusBar barStyle="dark-content" backgroundColor="#01aed6" />

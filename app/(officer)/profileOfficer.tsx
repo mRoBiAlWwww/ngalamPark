@@ -8,16 +8,27 @@ import FAQ from "../../assets/images/ChatsCircle.svg";
 import Help from "../../assets/images/Question.svg";
 import Pencil from "../../assets/images/PencilSimpleLine.svg";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useSelector } from "react-redux"; // Ditambahkan untuk useSelector
+import { useDispatch, useSelector } from "react-redux"; // Ditambahkan untuk useSelector
 import { RootState } from "../../../ngalamPark/redux/store"; // Asumsi lokasi store, sesuaikan jika berbeda
+import { getDatabase, ref, update } from "firebase/database";
+import { resetUserAccount } from "@/redux/slice/userAccountSlice";
 
 const ProfileOfficer: React.FC = () => {
     const router = useRouter();
-    const account = useSelector((state: RootState) => state.userAccount);
-    
+    const officer = useSelector((state: RootState) => state.officerAccount);
+    const db = getDatabase();
+    const dispatch = useDispatch();
+
     const handleSignOut = async (): Promise<void> => {
         try {
+            await update(ref(db, "officer/" + officer.id), {
+                id: officer.id,
+                name: officer.name,
+                location: officer.location,
+                nameLocation: officer.nameLocation,
+            });
             await signOut(FIREBASE_AUTH);
+            dispatch(resetUserAccount());
             router.replace("/(auth)/defaultPage");
         } catch (error: any) {
             console.error(error.message);
@@ -36,10 +47,10 @@ const ProfileOfficer: React.FC = () => {
                     <View className="flex-row items-center">
                         <View>
                             <Text className="font-workSemiBold text-3xl">
-                                Rasya Fariz
+                                {officer.name}
                             </Text>
                             <Text className="font-work text-sm text-gray-400">
-                                rasyaafrz@student.ub.ac.id
+                                {officer.name}@student.ub.ac.id
                             </Text>
                         </View>
                         <TouchableOpacity

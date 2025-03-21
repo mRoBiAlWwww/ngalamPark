@@ -4,12 +4,14 @@ interface officerAccountState {
     id: string;
     name: string;
     location: string;
+    nameLocation: string;
 }
 
 const initialState: officerAccountState = {
     id: "",
     name: "",
     location: "",
+    nameLocation: "",
 };
 
 const officerAccountSlice = createSlice({
@@ -20,9 +22,12 @@ const officerAccountSlice = createSlice({
             state.id = action.payload.id;
             state.name = action.payload.name;
             state.location = action.payload.location;
+            state.nameLocation = action.payload.nameLocation;
         },
+        resetOfficerAccount: () => initialState,
     },
 });
 
-export const { setOfficerAccount } = officerAccountSlice.actions;
+export const { setOfficerAccount, resetOfficerAccount } =
+    officerAccountSlice.actions;
 export default officerAccountSlice.reducer;

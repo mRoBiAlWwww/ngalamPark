@@ -61,7 +61,6 @@ export default function Scanner() {
 
     const handleQRScan = (data: string) => {
         if (data && !qrLock.current && permission?.granted) {
-            // Hanya scan jika izin diberikan
             qrLock.current = true;
             try {
                 router.push({
@@ -75,7 +74,6 @@ export default function Scanner() {
         }
     };
 
-    // Jika izin belum diberikan, tampilkan pesan sementara
     if (!permission?.granted) {
         return (
             <SafeAreaView style={StyleSheet.absoluteFillObject}>
