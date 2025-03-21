@@ -2,7 +2,9 @@ import { Tabs } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Pressable, TouchableWithoutFeedback } from "react-native";
+import { Pressable, View } from "react-native";
+import QRon from "../../assets/images/QRbiru.svg";
+import QRoff from "../../assets/images/QRCoklat.svg";
 
 export default function TabLayout() {
     return (
@@ -60,7 +62,35 @@ export default function TabLayout() {
                     ),
                 }}
             />
-            <Tabs.Screen name="qrPage" />
+            <Tabs.Screen
+                name="qrPage"
+                options={{
+                    tabBarIcon: ({ focused }) =>
+                        focused ? (
+                            <QRon
+                                width={100}
+                                height={100}
+                                style={{ marginLeft: 30, marginBottom: -20 }}
+                            />
+                        ) : (
+                            <QRoff
+                                width={100}
+                                height={100}
+                                style={{ marginLeft: 30, marginBottom: -20 }}
+                            />
+                        ),
+                    tabBarLabel: () => null,
+                    tabBarButton: (props) => (
+                        <View className="relative">
+                            <Pressable
+                                {...props}
+                                android_ripple={{ color: "transparent" }}
+                                className="relative w-52 h-52 -top-10 -left-20 bg-red-500 z-40"
+                            />
+                        </View>
+                    ),
+                }}
+            />
             <Tabs.Screen
                 name="(smartpark)"
                 options={{

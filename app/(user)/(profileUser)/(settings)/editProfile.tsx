@@ -20,10 +20,14 @@ const editProfile = () => {
     const [name, setName] = useState<string>("");
     const [callNumber, setCallNumber] = useState<string>("");
     const db = getDatabase();
-
+    const isValidCallNumber = (callNumber: string) =>
+        /^\d{12,13}$/.test(callNumber);
     const account = useSelector((state: RootState) => state.userAccount);
 
     const updateDetailAccount = () => {
+        if (!isValidCallNumber(callNumber)) {
+            return showToast("Nomor wajib 12 atau 13 digit");
+        }
         update(ref(db, "users/" + account.id), {
             name,
             callNumber,

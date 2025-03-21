@@ -12,63 +12,12 @@ import OVO from "../../../../assets/images/ovo2.svg";
 import Coin from "../../../../assets/images/coin.svg";
 import { StatusBar } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { AntDesign, Feather, FontAwesome5 } from "@expo/vector-icons";
-import {
-    get,
-    getDatabase,
-    onValue,
-    push,
-    query,
-    ref,
-    remove,
-    set,
-    update,
-} from "firebase/database";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { getDatabase, onValue, query, ref } from "firebase/database";
 import { RootState } from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { SvgProps } from "react-native-svg";
-
-import { ScrollView } from "react-native";
-
-const bookingData = [
-    {
-        id: "1",
-        day: "Senin 10 Feb 2025",
-        name: "Budi Santoso",
-        bookingId: "#1310281320132",
-        time: "08:20",
-        vehicle: "Honda Beat",
-        status: "Antrian",
-    },
-    {
-        id: "2",
-        day: "Jumat 7 Feb 2025",
-        name: "John Mayer",
-        bookingId: "#1310281320132",
-        time: "08:20",
-        vehicle: "Honda Scoopy",
-        status: "Sedang Parkir",
-    },
-    {
-        id: "3",
-        day: "Kamis 6 Feb 2025",
-        name: "Tim Henson",
-        bookingId: "#1310281320132",
-        time: "08:20",
-        vehicle: "Yamaha N-Max",
-        status: "Selesai",
-    },
-    {
-        id: "4",
-        day: "Rabu 5 Feb 2025",
-        name: "Mateus Asato",
-        bookingId: "#1310281320132",
-        time: "08:20",
-        vehicle: "Honda Beat",
-        status: "Antrian",
-    },
-];
 
 const showToast = (message: string) => {
     Toast.show({
@@ -279,23 +228,6 @@ const listBooking: React.FC = () => {
         return () => unsubscribeDetailBooking();
     }, [account.booking]);
 
-    const details = [
-        { label: "Tempat", value: detailBookings?.nameLocation ?? "" },
-        { label: "Alamat", value: detailBookings?.address ?? "" },
-        {
-            label: "Waktu",
-            value: detailBookings ? convertToWIB(detailBookings.timestamp) : "",
-        },
-        {
-            label: "Tanggal",
-            value: detailBookings
-                ? getFormattedDateWIB(detailBookings.timestamp)
-                : "",
-        },
-        { label: "Plat Nomor", value: detailBookings?.platNomor ?? "" },
-        { label: "Metode Pembayaran", value: detailBookings?.methode ?? "" },
-        { label: "Jumlah", value: detailBookings?.cost ?? 0 },
-    ];
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor="#F2F1F9" />

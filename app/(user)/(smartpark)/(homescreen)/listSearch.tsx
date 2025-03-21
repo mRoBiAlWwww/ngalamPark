@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { get, getDatabase, onValue, ref } from "firebase/database";
 import { RootState } from "@/redux/store";
-import SvgObject from "../../../assets/images/searhSmartpark.svg";
+import SvgObject from "../../../../assets/images/searhSmartpark.svg";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { router, useFocusEffect } from "expo-router";
@@ -54,12 +54,12 @@ const listSearch = () => {
                           },
                       });
             }}
-            className="bg-white border-[1px] border-gray-300 rounded-2xl p-3 gap-2 flex-row my-2"
+            className="bg-white border-[1px] border-gray-300 rounded-2xl p-3 gap-5 flex-row my-2"
         >
             <View className="w-1/4 mt-2">
                 <Image
                     style={{ width: 96, height: 160, borderRadius: 8 }}
-                    source={require("../../../assets/images/dummyBento.png")}
+                    source={require("../../../../assets/images/dummyBento.png")}
                 />
             </View>
             <View className="w-3/4 flex gap-1 pl-2 pr-5">

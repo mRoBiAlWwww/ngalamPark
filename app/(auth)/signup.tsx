@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
     KeyboardAvoidingView,
     ScrollView,
     TouchableOpacity,
+    StatusBar,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -53,7 +54,8 @@ const signUp: React.FC = () => {
     const isValidEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
     const isWeakPass = (pass: string) => pass.length < 8;
     const isValidCallNumber = (callNumber: string) =>
-        /^08\d{10,11}$/.test(callNumber);
+        /^\d{12,13}$/.test(callNumber);
+    const isValidKTP = (NIK: string) => /^\d{16}$/.test(NIK);
 
     const handleSearch = async (
         officerNameLocation: string
@@ -81,12 +83,25 @@ const signUp: React.FC = () => {
 
     const signUp = async (): Promise<void> => {
         try {
+            if (
+                !name ||
+                !email ||
+                !pass ||
+                !confirmPass ||
+                !KTP ||
+                !callNumber ||
+                !location
+            ) {
+                showToast("Error, Harap isi semua field!");
+                return;
+            }
             if (!isValidEmail(email)) return showToast("Format email salah.");
-            if (isWeakPass(pass)) return showToast("Pass minimal 8 karakter.");
-            if (isValidCallNumber(callNumber)) {
-                return showToast(
-                    "Nomor wajib 12 atau 13 digit serta diawali dengan 08"
-                );
+            if (!isWeakPass(pass)) return showToast("Pass minimal 8 karakter.");
+            if (!isValidCallNumber(callNumber)) {
+                return showToast("Nomor wajib 12 atau 13 digit");
+            }
+            if (!isValidKTP(KTP)) {
+                return showToast("KTP wajib 16 digit");
             }
             if (pass !== confirmPass) {
                 return showToast("Pass tidak cocok!");
@@ -115,12 +130,9 @@ const signUp: React.FC = () => {
                         PIN: "",
                         booking: "",
                     });
-                    console.log("Data berhasil ditambahkan");
                 } catch (error: any) {
                     showToast(error.message);
                 }
-
-                // await saveData("users/" + uid, userData);
             } else {
                 const nameLocation = await handleSearch(location);
                 try {
@@ -133,12 +145,9 @@ const signUp: React.FC = () => {
                         location,
                         nameLocation,
                     });
-                    console.log("Data berhasil ditambahkan");
-                    console.log(nameLocation);
                 } catch (error: any) {
                     showToast(error.message);
                 }
-                // await saveData("officer/" + uid, userData);
             }
             await sendEmailVerification(userCredential.user);
             router.replace("/(auth)/login");
@@ -154,12 +163,8 @@ const signUp: React.FC = () => {
     };
 
     return (
-        // <KeyboardAwareScrollView
-        //     style={{ flex: 1 }}
-        //     bottomOffset={62}
-        //     // keyboardVerticalOffset={120}
-        // ></KeyboardAwareScrollView>
         <KeyboardAvoidingView style={{ flex: 1 }} keyboardVerticalOffset={120}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F2F1F9" />
             <ScrollView>
                 <View className="flex items-center ">
                     <Text className="font-maison text-3xl mt-36 text-black">

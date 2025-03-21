@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { StatusBar, Text, View } from "react-native";
 import React from "react";
 import ButtonRegister from "../../components/ButtonRegister";
 import { useRouter } from "expo-router";
@@ -9,6 +9,7 @@ const defaultPage: React.FC = () => {
 
     return (
         <View className="flex items-center bg-defaultBackground h-full ">
+            <StatusBar barStyle="dark-content" backgroundColor="#F2F1F9" />
             <Text className="font-maison text-3xl mt-48 text-black">
                 NGALAMPARK
             </Text>

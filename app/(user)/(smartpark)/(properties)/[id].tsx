@@ -1,12 +1,4 @@
-// filepath: e:\ProjectInternRaion\ngalamPark\app\(user)\(home)\[id].tsx
-import {
-    View,
-    Text,
-    StatusBar,
-    Image,
-    TouchableOpacity,
-    TextInput,
-} from "react-native";
+import { View, Text, StatusBar, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -79,7 +71,6 @@ const DetailSearch = () => {
     const [methodChoice, setMethodChoice] = useState<string>("");
     const [methode, setMethode] = useState<Methode | null>();
     const [isPress, setIsPress] = useState<string>("");
-    // const [isError, setIsError] = useState<boolean>(false);
     const dispatch = useDispatch();
     const account = useSelector((state: RootState) => state.userAccount);
     const [showOption, setShowOption] = useState<boolean>(false);
@@ -88,6 +79,16 @@ const DetailSearch = () => {
         shopeepay: 0,
         coin: 0,
     });
+    const isValidPlateNumber = (plate: string) =>
+        /^[A-Z]{1,2}\s\d{1,4}\s?[A-Z]{0,3}$/.test(plate);
+
+    const isValidDate = (date: string) =>
+        /^\d{2}\/\d{2}\/\d{4}$/.test(date) &&
+        (() => {
+            const [day, month, year] = date.split("/").map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            return day > 0 && day <= daysInMonth && month >= 1 && month <= 12;
+        })();
 
     const handleDetailSearch = async () => {
         try {
@@ -134,6 +135,11 @@ const DetailSearch = () => {
             showToast("Error, Harap isi semua field!");
             return;
         }
+        if (!isValidPlateNumber(nomor))
+            return showToast("Format Plat nomor salah.");
+
+        if (!isValidDate(date)) return showToast("Format tanggal salah.");
+
         try {
             dispatch(
                 setUserAccount({
@@ -274,6 +280,7 @@ const DetailSearch = () => {
         );
         return () => unsubscribe();
     }, []);
+
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor="#F4FBF8" />
@@ -472,69 +479,83 @@ const DetailSearch = () => {
             <ScrollView
                 className={`bg-loginColor h-full px-10 relative mx-auto pt-10`}
             >
-                <View className="mx-auto mt-5">
-                    <Image
-                        className="w-96 h-60 rounded-3xl"
-                        source={require("../../../../assets/images/dummyPujas.jpg")}
+                <View className="relative min-h-screen">
+                    <View className="mx-auto mt-5">
+                        <Image
+                            className="w-96 h-60 rounded-3xl"
+                            source={require("../../../../assets/images/dummyPujas.jpg")}
+                        />
+                    </View>
+                    <View className="flex-row mt-10 justify-between">
+                        <View className="flex gap-2 w-3/5">
+                            <Text className="font-workSemiBold text-3xl mb-3">
+                                {detailSearchResult?.name}
+                            </Text>
+                            <View className="flex-row gap-4">
+                                <Entypo
+                                    name="time-slot"
+                                    size={20}
+                                    color="black"
+                                />
+                                <Text className="font-work text-xl">
+                                    Sisa slot : {detailSearchResult?.slot}/40
+                                </Text>
+                            </View>
+                            <View className="flex-row gap-5">
+                                <FontAwesome
+                                    name="user"
+                                    size={24}
+                                    color="black"
+                                />
+                                <Text className="font-work text-xl">
+                                    Bapak {detailSearchResult?.officer}
+                                </Text>
+                            </View>
+                            <View className="flex-row gap-4">
+                                <Entypo
+                                    name="address"
+                                    size={24}
+                                    color="black"
+                                />
+                                <Text className="font-work text-xl">
+                                    {detailSearchResult?.address}
+                                </Text>
+                            </View>
+                        </View>
+                        <View className="flex-row gap-2 mt-2">
+                            {detailSearchResult?.rate !== undefined &&
+                                countStar(detailSearchResult.rate)}
+                        </View>
+                        <View className="flex-row items-center justify-end -ml-16">
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setShowOption(!showOption);
+                                }}
+                                className="flex-row gap-2 mt-2"
+                            >
+                                <MaterialIcons
+                                    name="playlist-add"
+                                    size={40}
+                                    color="black"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View className="bg-white rounded-3xl border-2 border-gray-200 p-3 my-5 mx-auto w-full">
+                        <Text className="font-work text-xl">
+                            {detailSearchResult?.review}
+                        </Text>
+                    </View>
+                    <ButtonRegister
+                        title="Booking"
+                        onPress={() => {
+                            setIsShow(!isShow);
+                        }}
+                        componentStyle="px-5 py-3 rounded-full font-bold flex justify-center items-center w-full mx-auto overflow-hidden "
+                        textStyle="text-white text-lg font-custom"
+                        colors={["#33D3F8", "#1B859D"]}
                     />
                 </View>
-                <View className="flex-row mt-10 justify-between">
-                    <View className="flex gap-2 w-3/5">
-                        <Text className="font-workSemiBold text-3xl mb-3">
-                            {detailSearchResult?.name}
-                        </Text>
-                        <View className="flex-row gap-4">
-                            <Entypo name="time-slot" size={20} color="black" />
-                            <Text className="font-work text-xl">
-                                Sisa slot : {detailSearchResult?.slot}/40
-                            </Text>
-                        </View>
-                        <View className="flex-row gap-5">
-                            <FontAwesome name="user" size={24} color="black" />
-                            <Text className="font-work text-xl">
-                                Bapak {detailSearchResult?.officer}
-                            </Text>
-                        </View>
-                        <View className="flex-row gap-4">
-                            <Entypo name="address" size={24} color="black" />
-                            <Text className="font-work text-xl">
-                                {detailSearchResult?.address}
-                            </Text>
-                        </View>
-                    </View>
-                    <View className="flex-row gap-2 mt-2">
-                        {detailSearchResult?.rate !== undefined &&
-                            countStar(detailSearchResult.rate)}
-                    </View>
-                    <View className="flex-row items-center justify-end -ml-16">
-                        <TouchableOpacity
-                            onPress={() => {
-                                setShowOption(!showOption);
-                            }}
-                            className="flex-row gap-2 mt-2"
-                        >
-                            <MaterialIcons
-                                name="playlist-add"
-                                size={40}
-                                color="black"
-                            />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View className="bg-white rounded-3xl border-2 border-gray-200 p-3 my-10 mx-auto w-full">
-                    <Text className="font-work text-xl">
-                        {detailSearchResult?.review}
-                    </Text>
-                </View>
-                <ButtonRegister
-                    title="Booking"
-                    onPress={() => {
-                        setIsShow(!isShow);
-                    }}
-                    componentStyle="px-5 py-3 rounded-full font-bold flex justify-center items-center w-full mx-auto overflow-hidden "
-                    textStyle="text-white text-lg font-custom"
-                    colors={["#33D3F8", "#1B859D"]}
-                />
             </ScrollView>
         </>
     );
