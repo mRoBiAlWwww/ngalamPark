@@ -2,16 +2,17 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
 
-const QrLayout = () => {
+const HomeLayout = () => {
     return (
         <>
             <StatusBar barStyle="dark-content" />
             <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Qrpage" />
-                <Stack.Screen name="(scanner)" />
+                <Stack.Screen name="smartPark" />
+                <Stack.Screen name="listSearch" />
+                <Stack.Screen name="(properties)" />
             </Stack>
         </>
     );
 };
 
-export default QrLayout;
+export default HomeLayout;

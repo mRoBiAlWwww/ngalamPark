@@ -1,7 +1,6 @@
-import { FIREBASE_AUTH, FIREBASE_DB } from "@/lib/firebaseconfig";
-import { Redirect, useFocusEffect, useRouter } from "expo-router";
+import { FIREBASE_AUTH } from "@/lib/firebaseconfig";
+import { useFocusEffect, useRouter } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StatusBar, View } from "react-native";
 import Logo1 from "../assets/images/Logo1.svg";
@@ -72,7 +71,3 @@ const index: React.FC = () => {
 };
 
 export default index;
-
-{
-    /* <Redirect href={isLoggedIn ? "/(tabs)/home" : "/(auth)/login"} />; */
-}

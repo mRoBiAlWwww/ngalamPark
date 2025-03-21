@@ -3,10 +3,10 @@ import React from "react";
 
 const _layout = () => {
     return (
-        <Tabs>
-            <Tabs.Screen name="homeOfficer" options={{ title: "Beranda" }} />
-            <Tabs.Screen name="(qrScanner)" options={{ title: "qrScan" }} />
-            <Tabs.Screen name="profileOfficer" options={{ title: "Profile" }} />
+        <Tabs screenOptions={{ headerShown: false }}>
+            <Tabs.Screen name="(home)" />
+            <Tabs.Screen name="(qrScanner)" />
+            <Tabs.Screen name="profileOfficer" />
         </Tabs>
     );
 };

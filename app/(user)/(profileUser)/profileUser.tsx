@@ -9,14 +9,24 @@ import Help from "../../../assets/images/Question.svg";
 import Pencil from "../../../assets/images/PencilSimpleLine.svg";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { resetUserAccount } from "../../../redux/slice/userAccountSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { getDatabase, ref, set, update } from "firebase/database";
 
 const profile: React.FC = () => {
     const router = useRouter();
     const dispatch = useDispatch();
-
+    const account = useSelector((state: RootState) => state.userAccount);
+    const db = getDatabase();
     const handleSignOut = async () => {
         try {
+            await update(ref(db, "users/" + account.id), {
+                id: account.id,
+                name: account.name,
+                email: account.email,
+                PIN: account.PIN,
+                booking: account.booking,
+            });
             await signOut(FIREBASE_AUTH);
             dispatch(resetUserAccount());
             router.replace("/(auth)/defaultPage");
@@ -25,6 +35,7 @@ const profile: React.FC = () => {
         }
     };
 
+    console.log(account.id);
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor="#F2F1F9" />
@@ -37,10 +48,10 @@ const profile: React.FC = () => {
                     <View className="flex-row">
                         <View>
                             <Text className="font-workSemiBold text-3xl">
-                                Rasya Fariz
+                                {account.name}
                             </Text>
                             <Text className="font-work text-sm text-gray-400">
-                                rasyaafrz@student.ub.ac.id
+                                {account.email}
                             </Text>
                         </View>
                         <TouchableOpacity
@@ -60,7 +71,11 @@ const profile: React.FC = () => {
                             <TouchableOpacity
                                 onPress={() => router.push("/PIN")}
                             >
-                                <Text className="font-work">Ubah PIN</Text>
+                                <Text className="font-work">
+                                    {account.PIN === null
+                                        ? "Buat PIN"
+                                        : "Ubah PIN"}
+                                </Text>
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity>

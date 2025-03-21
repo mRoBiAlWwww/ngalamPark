@@ -8,7 +8,7 @@ const HomeLayout = () => {
             <StatusBar barStyle="dark-content" />
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="homeUser" />
-                <Stack.Screen name="[id]" />
+                <Stack.Screen name="properties" />
             </Stack>
         </>
     );
