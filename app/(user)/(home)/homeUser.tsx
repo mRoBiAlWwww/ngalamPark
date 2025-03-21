@@ -21,6 +21,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { get, getDatabase, onValue, ref } from "firebase/database";
 import Toast from "react-native-toast-message";
+import Rectangle from "../../../assets/images/Rectangle.svg";
+import Rectangle2 from "../../../assets/images/Rectangle2.svg";
 
 const formatRupiah = (amount: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -353,42 +355,33 @@ const homeUser: React.FC = () => {
                             </View>
                         )}
 
-                        <View className="flex-row gap-2 px-6 mt-10 ">
-                            <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
-                                <View className="h-32">
-                                    <Image
-                                        className="w-full h-full"
-                                        source={require("../../../assets/images/dummyPujas.jpg")}
-                                    />
+                        <View className="flex-row gap-2 px-4 mt-5 justify-center mb-52">
+                            <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2 shadow-lg">
+                                <View className="=flex items-center">
+                                    <Rectangle />
                                 </View>
                                 <View className="gap-2 p-4">
-                                    <Text className="font-workSemiBold text">
-                                        Bento Kopi UIN Malang
+                                    <Text className="font-workSemiBold text-2xl">
+                                        Freepark
                                     </Text>
                                     <Text className="font-work text-sm">
-                                        Tempatnya bagus banget dan luas, petugas
-                                        parkirnya ramah - ramah. Dengan tempat
-                                        parkir yang luas sangat memudahkan
-                                        sekali.
+                                        Bebas ribet, parkir makin gampang cuma
+                                        dengan 100 ribu per bulan!
                                     </Text>
                                 </View>
                             </View>
-                            <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2">
+                            <View className="bg-gray-100 rounded-2xl overflow-hidden w-1/2 shadow-lg">
                                 <View className="h-32">
-                                    <Image
-                                        className="w-full h-full"
-                                        source={require("../../../assets/images/dummyPujas.jpg")}
-                                    />
+                                    <Rectangle2 />
                                 </View>
                                 <View className="gap-2 p-4">
-                                    <Text className="font-workSemiBold text">
-                                        Bento Kopi UIN Malang
+                                    <Text className="font-workSemiBold text-2xl">
+                                        Freemium
                                     </Text>
                                     <Text className="font-work text-sm">
-                                        Tempatnya bagus banget dan luas, petugas
-                                        parkirnya ramah - ramah. Dengan tempat
-                                        parkir yang luas sangat memudahkan
-                                        sekali.
+                                        Paket Premium Buat Kamu yang #MauLebih.
+                                        Parkir nyaman, untung maksimal, cuma 150
+                                        ribu per bulan!
                                     </Text>
                                 </View>
                             </View>

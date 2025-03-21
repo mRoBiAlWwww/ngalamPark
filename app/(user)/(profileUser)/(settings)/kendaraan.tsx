@@ -27,12 +27,20 @@ const Kendaraan = () => {
     const [plateNumber, setPlateNumber] = useState<string>("");
     const [vehicleType, setVehicleType] = useState<string>("");
     const [stnk, setStnk] = useState<string>("");
+    const isValidPlateNumber = (plate: string) =>
+        /^[A-Z]{1,2}\s\d{1,4}\s?[A-Z]{0,3}$/.test(plate);
+    const isValidSTNK = (stnk: string) => /^[A-Z]{1,2}\s\d{11}$/.test(stnk);
 
     const saveVehicleData = async () => {
         if (!plateNumber || !vehicleType) {
             showToast("Error, Harap isi semua field!");
             return;
         }
+        if (!isValidPlateNumber(plateNumber))
+            return showToast("Format Plat nomor salah.");
+
+        if (!isValidSTNK(stnk)) return showToast("Format STNK salah.");
+
         try {
             const vehicleData = {
                 plateNumber,
@@ -40,8 +48,6 @@ const Kendaraan = () => {
                 timestamp: new Date().toISOString(),
                 accountId: account.id,
             };
-
-            console.log("Account ID saat menyimpan:", account.id);
 
             await AsyncStorage.setItem(
                 "vehicleData",
@@ -71,7 +77,7 @@ const Kendaraan = () => {
             <View className="flex-row mt-28 mb-20 gap-5 px-10 relative -left-5">
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    className="self-start relative -left-14"
+                    className="self-start relative -left-6"
                 >
                     <Ionicons
                         name="arrow-back-circle-outline"

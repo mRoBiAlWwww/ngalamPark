@@ -1,15 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, Alert, TouchableOpacity } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import {
-    get,
-    getDatabase,
-    onValue,
-    push,
-    ref,
-    set,
-    update,
-} from "firebase/database";
+import { get, getDatabase, push, ref, set, update } from "firebase/database";
 import { FIREBASE_APP } from "@/lib/firebaseconfig";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../redux/store";
@@ -26,12 +18,11 @@ interface VehicleData {
 
 const VehicleDetail = () => {
     const { qrData } = useLocalSearchParams<{ qrData: string }>();
-    const now = new Date();
     const router = useRouter();
     const db = getDatabase(FIREBASE_APP);
     const officer = useSelector((state: RootState) => state.officerAccount);
     const parseQRData = (data: string): VehicleData => {
-        const parts = data.split(", ");
+        const parts = data.split(",");
 
         const vehicleData: Partial<VehicleData> = {};
         parts.forEach((part) => {
@@ -51,25 +42,13 @@ const VehicleDetail = () => {
     };
     const vehicleData = parseQRData(qrData);
 
-    console.log(vehicleData.accountId);
-    console.log(vehicleData.nameLocation);
-    console.log(vehicleData.officerId);
-    console.log(vehicleData.paymentStatus);
-    console.log(vehicleData.plateNumber);
-    console.log(vehicleData.timestamp);
-    console.log(vehicleData.vehicleType);
-
     const handlePayment = async () => {
         try {
-            const snapshot = await get(
-                ref(
-                    db,
-                    "officerPayment/" +
-                        officer.nameLocation +
-                        "/" +
-                        vehicleData.accountId
-                )
+            const paymentRef = ref(
+                db,
+                `officerPayment/${officer.nameLocation}/${vehicleData.accountId}`
             );
+            const snapshot = await get(paymentRef);
             const currentStatus = snapshot.val()?.paymentStatus || "outsite";
             const newStatus = currentStatus === "insite" ? "outsite" : "insite";
 
@@ -82,27 +61,53 @@ const VehicleDetail = () => {
                 officerId: vehicleData.officerId,
             };
 
-            if (officer.id) {
-                await update(
-                    ref(
-                        db,
-                        "officerPayment/" +
-                            officer.nameLocation +
-                            "/" +
-                            vehicleData.accountId
-                    ),
-                    paymentData
+            await set(paymentRef, paymentData);
+
+            const saldoRef = ref(db, `users/${vehicleData.accountId}/saldo`);
+            const slotRef = ref(db, `parkLocation/${officer.nameLocation}`);
+
+            const getSlot = await get(slotRef);
+            const currentSlot = getSlot.val()?.slot || 0;
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, "0");
+            const paymentMonthRef = ref(
+                db,
+                `payment/${vehicleData.accountId}/${year}/${month}`
+            );
+            await set(push(paymentMonthRef), paymentData);
+
+            if (newStatus === "insite") {
+                const getSaldo = await get(
+                    ref(db, `users/${vehicleData.accountId}/saldo/ovo`)
+                );
+                const getSaldoCoin = await get(
+                    ref(db, `users/${vehicleData.accountId}/saldo/coin`)
                 );
 
+                await update(saldoRef, {
+                    ovo: (getSaldo.val() || 0) - 4000,
+                    coin: (getSaldoCoin.val() || 0) + 2,
+                });
+
+                await update(slotRef, {
+                    slot: Math.max(currentSlot - 1, 0),
+                });
                 Alert.alert(
                     "Sukses",
                     "Pembayaran berhasil",
-                    [
-                        {
-                            text: "OK",
-                            onPress: () => router.back(),
-                        },
-                    ],
+                    [{ text: "OK", onPress: () => router.back() }],
+                    { cancelable: false }
+                );
+            } else {
+                await update(slotRef, {
+                    slot: currentSlot + 1,
+                });
+                Alert.alert(
+                    "Terimakasih",
+                    "Semoga perjalananmu selamat dan menyenangkan",
+                    [{ text: "OK", onPress: () => router.back() }],
                     { cancelable: false }
                 );
             }
@@ -111,82 +116,6 @@ const VehicleDetail = () => {
             Alert.alert("Error", "Gagal memproses pembayaran");
         }
     };
-
-    useEffect(() => {
-        if (vehicleData.plateNumber) {
-            const vehicleRef = ref(
-                db,
-                "officerPayment/" +
-                    officer.nameLocation +
-                    +"/" +
-                    vehicleData.accountId
-            );
-
-            const unsubscribe = onValue(vehicleRef, (snapshot) => {
-                (async () => {
-                    const data = snapshot.val();
-                    if (data?.paymentStatus === "insite") {
-                        Alert.alert(
-                            "Pembayaran Berhasil",
-                            `Pembayaran berhasil sebesar Rp2000 dan menambah poin 2`,
-                            [{ text: "OK" }]
-                        );
-
-                        const getSaldo = await get(
-                            ref(
-                                db,
-                                "users/" + vehicleData.accountId + "/saldo/ovo"
-                            )
-                        );
-                        const getSaldoCoin = await get(
-                            ref(
-                                db,
-                                "users/" + vehicleData.accountId + "/saldo/coin"
-                            )
-                        );
-
-                        await update(
-                            ref(
-                                db,
-                                "users/" + vehicleData.accountId + "/saldo"
-                            ),
-                            {
-                                ovo: getSaldo.val() - 2100,
-                                coin: getSaldoCoin.val() + 2,
-                            }
-                        );
-
-                        await set(
-                            push(
-                                ref(
-                                    db,
-                                    "payment/" +
-                                        vehicleData.accountId +
-                                        "/" +
-                                        now.getFullYear() +
-                                        "/" +
-                                        (now.getMonth() + 1)
-                                            .toString()
-                                            .padStart(2, "0")
-                                )
-                            ),
-                            {
-                                plateNumber: vehicleData.plateNumber,
-                                vehicleType: vehicleData.vehicleType,
-                                officerId: vehicleData.officerId,
-                                status: vehicleData.paymentStatus,
-                                timestamp: vehicleData.timestamp,
-                                accountId: vehicleData.accountId,
-                                nameLocation: vehicleData.nameLocation,
-                            }
-                        );
-                    }
-                })();
-            });
-
-            return () => unsubscribe();
-        }
-    }, [vehicleData]);
 
     if (!vehicleData) {
         return (

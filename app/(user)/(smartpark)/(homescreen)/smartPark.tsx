@@ -7,8 +7,8 @@ import {
     Alert,
 } from "react-native";
 import React, { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import ButtonRegister from "../../../components/ButtonRegister";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import ButtonRegister from "../../../../components/ButtonRegister";
 import { router } from "expo-router";
 
 const smartPark: React.FC = () => {
@@ -17,12 +17,12 @@ const smartPark: React.FC = () => {
         <View className="relative">
             <>
                 <ImageBackground
-                    source={require("../../../assets/images/Group.png")}
+                    source={require("../../../../assets/images/Group.png")}
                     className=" h-3/4"
                 >
                     <View className="flex-row gap-2 items-center px-3 py-1 bg-white rounded-full w-3/4 justify-center mx-auto my-10">
                         <Image
-                            source={require("../../../assets/images/Logo.jpg")}
+                            source={require("../../../../assets/images/Logo.jpg")}
                             className="w-5 h-5"
                         />
                         <Text className=" font-workSemiBold">Ngalam Park</Text>
@@ -43,7 +43,7 @@ const smartPark: React.FC = () => {
                         <View className="bg-white rounded-2xl flex-row justify-evenly items-center gap-2 px-4 py-6">
                             <View className="border-[1px] border-gray-200 rounded-full px-2 w-12 h-12 items-center justify-center ">
                                 <Image
-                                    source={require("../../../assets/images/Logo.jpg")}
+                                    source={require("../../../../assets/images/Logo.jpg")}
                                     className="w-7 h-7"
                                 />
                             </View>
@@ -74,7 +74,7 @@ const smartPark: React.FC = () => {
                         <View className="bg-white rounded-2xl flex-row justify-evenly items-center gap-2 px-4 py-6">
                             <View className="border-[1px] border-gray-200 rounded-full px-2 w-12 h-12 items-center justify-center ">
                                 <Image
-                                    source={require("../../../assets/images/Logo.jpg")}
+                                    source={require("../../../../assets/images/Logo.jpg")}
                                     className="w-7 h-7"
                                 />
                             </View>
@@ -103,7 +103,7 @@ const smartPark: React.FC = () => {
                         <View className="bg-white rounded-2xl flex-row justify-evenly items-center gap-2 px-4 py-6">
                             <View className="border-[1px] border-gray-200 rounded-full px-2 w-12 h-12 items-center justify-center ">
                                 <Image
-                                    source={require("../../../assets/images/Logo.jpg")}
+                                    source={require("../../../../assets/images/Logo.jpg")}
                                     className="w-7 h-7"
                                 />
                             </View>
@@ -130,6 +130,19 @@ const smartPark: React.FC = () => {
                             </View>
                         </View>
                     </View>
+                    <TouchableOpacity
+                        onPress={() => router.push("/promoPage")}
+                        className="w-[90%] mx-auto mt-5 flex-row justify-between bg-secondary border-2 border-primary rounded-full py-2 px-5"
+                    >
+                        <Text className="font-workSemiBold text-lg text-primary">
+                            Lihat detail benefitnya
+                        </Text>
+                        <AntDesign
+                            name="arrowright"
+                            size={24}
+                            color="#01aed6"
+                        />
+                    </TouchableOpacity>
                 </ImageBackground>
             </>
             {isShow !== "" ? (

@@ -11,7 +11,15 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { resetUserAccount } from "../../../redux/slice/userAccountSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getDatabase, ref, set, update } from "firebase/database";
+import { getDatabase, ref, update } from "firebase/database";
+import Toast from "react-native-toast-message";
+
+const showToast = (message: string) => {
+    Toast.show({
+        type: "error",
+        text1: message,
+    });
+};
 
 const profile: React.FC = () => {
     const router = useRouter();
@@ -30,12 +38,11 @@ const profile: React.FC = () => {
             await signOut(FIREBASE_AUTH);
             dispatch(resetUserAccount());
             router.replace("/(auth)/defaultPage");
-        } catch (error) {
-            console.error("Error saat sign out:", error);
+        } catch (error: any) {
+            showToast(error.message);
         }
     };
 
-    console.log(account.id);
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor="#F2F1F9" />

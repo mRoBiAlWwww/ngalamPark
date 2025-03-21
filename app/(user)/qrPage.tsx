@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StatusBar } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "expo-router";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import Toast from "react-native-toast-message";
 
 interface VehicleData {
     nameLocation: string;
@@ -13,10 +16,16 @@ interface VehicleData {
     paymentStatus?: string;
     accountId: string;
 }
+const showToast = (message: string) => {
+    Toast.show({
+        type: "error",
+        text1: message,
+    });
+};
 
 const qrPage = () => {
     const [vehicleData, setVehicleData] = useState<VehicleData | null>(null);
-
+    const account = useSelector((state: RootState) => state.userAccount);
     useFocusEffect(
         React.useCallback(() => {
             const fetchVehicleData = async () => {
@@ -27,8 +36,8 @@ const qrPage = () => {
                     if (storedData) {
                         setVehicleData(JSON.parse(storedData));
                     }
-                } catch (error) {
-                    console.error("Gagal mengambil data:", error);
+                } catch (error: any) {
+                    showToast(error.message);
                 }
             };
             fetchVehicleData();
@@ -43,7 +52,7 @@ const qrPage = () => {
             <StatusBar barStyle="dark-content" backgroundColor="#01aed6" />
             <View className="p-10 mt-32">
                 <Text className="font-workSemiBold text-black text-3xl">
-                    Rasya Fariz
+                    {account.name}
                 </Text>
                 <Text className="font-work text-black text-justify mt-1">
                     Ini adalah QRCode kamu. Kamu bisa melakukan pembayaran

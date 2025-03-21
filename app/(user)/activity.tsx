@@ -25,7 +25,7 @@ import {
     update,
 } from "firebase/database";
 import { RootState } from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { SvgProps } from "react-native-svg";
 
@@ -73,7 +73,6 @@ const activity: React.FC = () => {
     );
     const db = getDatabase();
     const now = new Date();
-    // const dispatch = useDispatch();
 
     const account = useSelector((state: RootState) => state.userAccount);
 
@@ -115,7 +114,7 @@ const activity: React.FC = () => {
         const date = new Date(isoString);
         return date.toLocaleDateString("id-ID", {
             day: "2-digit",
-            month: "long", // Nama bulan dalam bahasa Indonesia
+            month: "long",
             year: "numeric",
             timeZone: "Asia/Jakarta",
         });

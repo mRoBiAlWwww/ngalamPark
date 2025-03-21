@@ -1,4 +1,3 @@
-// filepath: e:\ProjectInternRaion\ngalamPark\app\(user)\(home)\[id].tsx
 import { View, Text, StatusBar, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
@@ -167,8 +166,6 @@ const DetailSearch = () => {
                     <TouchableOpacity
                         onPress={() => {
                             setShowOption(!showOption);
-                            // setIsFavorite(!isFavorite);
-                            // addOrRemove();
                         }}
                         className="flex-row gap-2 mt-2"
                     >

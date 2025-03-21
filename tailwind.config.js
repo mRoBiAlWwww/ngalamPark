@@ -10,6 +10,7 @@ module.exports = {
                 grayForm: "#B6B6B6",
                 loginColor: "#F4FBF8",
                 defaultBackground: "#F2F1F9",
+                secondary: "#e1f7fc",
             },
             fontFamily: {
                 work: ["WorkSans"],

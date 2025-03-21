@@ -38,7 +38,7 @@ const ProfileOfficer: React.FC = () => {
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor="#F2F1F9" />
-            <View className="bg-defaultBackground px-10 h-full">
+            <View className="bg-defaultBackground px-10 h-full pt-20">
                 <View className="border-b-2 border-gray-300 pt-10 pb-5 flex-row items-center gap-5">
                     <Image
                         className="rounded-full w-20 h-20"

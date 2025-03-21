@@ -6,13 +6,11 @@ import { ActivityIndicator, StatusBar, View } from "react-native";
 import Logo1 from "../assets/images/Logo1.svg";
 import Toast from "react-native-toast-message";
 import { get, getDatabase, ref } from "firebase/database";
-import { useDispatch } from "react-redux";
 
 const index: React.FC = () => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const db = getDatabase();
-    const dispatch = useDispatch();
 
     const showToast = (message: string) => {
         Toast.show({
