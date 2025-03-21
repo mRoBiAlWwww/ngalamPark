@@ -17,7 +17,7 @@ const InputData: React.FC<InputDataProps> = ({
     value,
     onChangeText,
     children,
-    className = "flex-row border-2 border-gray-300 rounded-xl py-2 px-5 items-center ",
+    className = "flex-row border-2 border-gray-300 rounded-xl py-2 px-5 items-center",
 }) => {
     const childArray = React.Children.toArray(children);
     return (

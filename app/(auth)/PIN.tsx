@@ -37,7 +37,7 @@ const PIN = () => {
     const addPIN = async (PIN: number[]) => {
         try {
             await set(ref(db, "users/" + account.id + "/PIN"), PIN);
-            showToast("PIN berhasil dibuat.");
+            showToast("PIN berhasil diubah/didaftarkan.");
         } catch (error: any) {
             showToast(error.message);
         }
@@ -65,12 +65,9 @@ const PIN = () => {
                         setPIN2([]);
                     }
                 }
-            }, 0); // 🔹 Gunakan timeout untuk menunda setState
+            }, 0);
         }
-    }, [PIN]); // 🔹 useEffect akan berjalan setiap `PIN` berubah
-
-    console.log("pin 1 ", PIN);
-    console.log("pin 2", PIN2);
+    }, [PIN]);
 
     return (
         <View className="flex items-center bg-defaultBackground h-full pb-20">
@@ -87,14 +84,20 @@ const PIN = () => {
                     />
                 </TouchableOpacity>
                 <Text className="font-maison text-3xl mt-1 text-black">
-                    Buat PIN
+                    {account.PIN === "" ? "Buat PIN" : "Ubah PIN"}
                 </Text>
             </View>
 
             {/* PIN Display */}
             <View className="items-center gap-10">
                 <Text className="font-workSemiBold">
-                    {confirm ? "Konfirmasi PIN Anda" : " Daftarkan PIN Anda"}
+                    {confirm
+                        ? account.PIN === ""
+                            ? "Konfirmasi PIN Anda"
+                            : "Masukkan PIN baru anda"
+                        : account.PIN === ""
+                        ? " Daftarkan PIN Anda"
+                        : "Masukkan PIN anda sekarang"}
                 </Text>
                 <View className="flex-row gap-10 align-bottom">
                     {[...Array(5).keys()].map((_, index) => {

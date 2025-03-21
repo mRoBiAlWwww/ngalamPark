@@ -7,13 +7,14 @@ import ButtonRegister from "../../components/ButtonRegister";
 import Input from "../../components/Input";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ProgressBar } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { get, getDatabase, ref } from "firebase/database";
 import { setUserAccount } from "../../redux/slice/userAccountSlice";
 import { setOfficerAccount } from "../../redux/slice/officerAccountSlice";
 import React from "react";
+import { RootState } from "@/redux/store";
 
 export default function Login() {
     const router = useRouter();
@@ -24,6 +25,7 @@ export default function Login() {
     const [progress, setProgress] = useState(0);
     const dispatch = useDispatch();
     const db = getDatabase();
+    const account = useSelector((state: RootState) => state.userAccount);
 
     const showToast = (message: string) => {
         Toast.show({
@@ -52,12 +54,12 @@ export default function Login() {
             if (userSnapshot.exists()) {
                 dispatch(
                     setUserAccount({
-                        callNumber: userSnapshot.val().callNumber,
                         id: userSnapshot.val().id,
                         name: userSnapshot.val().name,
-                        role: userSnapshot.val().role,
-                        saldo: userSnapshot.val().saldo,
-                        PIN: "",
+                        email: userSnapshot.val().email,
+                        PIN: userSnapshot.val().PIN,
+                        booking: userSnapshot.val().booking,
+                        // bookingList: account.bookingList,
                     })
                 );
                 router.replace("/homeUser");
@@ -67,10 +69,8 @@ export default function Login() {
                 );
                 dispatch(
                     setOfficerAccount({
-                        callNumber: officerSnapshot.val().callNumber,
                         id: officerSnapshot.val().id,
                         name: officerSnapshot.val().name,
-                        role: officerSnapshot.val().role,
                         location: officerSnapshot.val().location,
                     })
                 );

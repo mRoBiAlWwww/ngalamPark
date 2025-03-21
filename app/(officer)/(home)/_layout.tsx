@@ -7,8 +7,8 @@ const QrLayout = () => {
         <>
             <StatusBar barStyle="dark-content" />
             <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Qrpage" />
-                <Stack.Screen name="(scanner)" />
+                <Stack.Screen name="homeOfficer" />
+                <Stack.Screen name="(list)" />
             </Stack>
         </>
     );
