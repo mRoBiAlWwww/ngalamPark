@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Alert, TouchableOpacity } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { get, getDatabase, onValue, ref, update } from "firebase/database";
+import {
+    get,
+    getDatabase,
+    onValue,
+    push,
+    ref,
+    set,
+    update,
+} from "firebase/database";
 import { FIREBASE_APP } from "@/lib/firebaseconfig";
-import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
+import { RootState } from "../../../../redux/store";
 
 interface VehicleData {
     plateNumber: string;
@@ -12,40 +20,44 @@ interface VehicleData {
     timestamp: string;
     accountId: string;
     paymentStatus: string;
+    nameLocation: string;
+    officerId: string;
 }
 
 const VehicleDetail = () => {
     const { qrData } = useLocalSearchParams<{ qrData: string }>();
-    const [vehicleAccount, setVehicleAccount] = useState<VehicleData | null>(
-        null
-    );
-    const officer = useSelector((state: RootState) => state.officerAccount);
+    const now = new Date();
     const router = useRouter();
     const db = getDatabase(FIREBASE_APP);
+    const officer = useSelector((state: RootState) => state.officerAccount);
+    const parseQRData = (data: string): VehicleData => {
+        const parts = data.split(", ");
 
-    const parseQRData = (data: string): VehicleData | null => {
-        try {
-            const parts = data.split(", ");
-
-            const vehicleData: Partial<VehicleData> = {};
-            parts.forEach((part) => {
-                const [key, value] = part.split(": ");
-                if (key.includes("Nomor Plat")) vehicleData.plateNumber = value;
-                if (key.includes("Jenis Kendaraan"))
-                    vehicleData.vehicleType = value;
-                if (key.includes("Waktu")) vehicleData.timestamp = value;
-                if (key.includes("Account ID")) {
-                    vehicleData.accountId = value;
-                }
-            });
-            return vehicleData as VehicleData;
-        } catch (error) {
-            return null;
-        }
+        const vehicleData: Partial<VehicleData> = {};
+        parts.forEach((part) => {
+            const [key, value] = part.split(": ");
+            if (key.includes("Nomor Plat") && value)
+                vehicleData.plateNumber = value;
+            if (key.includes("Jenis Kendaraan") && value)
+                vehicleData.vehicleType = value;
+            if (key.includes("Waktu")) vehicleData.timestamp = value;
+            if (key.includes("Account ID") && value) {
+                vehicleData.accountId = value;
+            }
+            vehicleData.nameLocation = officer.nameLocation;
+            vehicleData.officerId = officer.id;
+        });
+        return vehicleData as VehicleData;
     };
-    const vehicleData: VehicleData | null = qrData ? parseQRData(qrData) : null;
+    const vehicleData = parseQRData(qrData);
 
-    console.log("cek ", vehicleData);
+    console.log(vehicleData.accountId);
+    console.log(vehicleData.nameLocation);
+    console.log(vehicleData.officerId);
+    console.log(vehicleData.paymentStatus);
+    console.log(vehicleData.plateNumber);
+    console.log(vehicleData.timestamp);
+    console.log(vehicleData.vehicleType);
 
     const handlePayment = async () => {
         try {
@@ -53,9 +65,9 @@ const VehicleDetail = () => {
                 ref(
                     db,
                     "officerPayment/" +
-                        officer.id +
+                        officer.nameLocation +
                         "/" +
-                        vehicleData?.accountId
+                        vehicleData.accountId
                 )
             );
             const currentStatus = snapshot.val()?.paymentStatus || "outsite";
@@ -63,18 +75,19 @@ const VehicleDetail = () => {
 
             const paymentData = {
                 paymentStatus: newStatus,
-                plateNumber: vehicleData?.plateNumber,
-                vehicleType: vehicleData?.vehicleType,
+                plateNumber: vehicleData.plateNumber,
+                vehicleType: vehicleData.vehicleType,
                 timestamp: new Date().toISOString(),
-                accountId: vehicleData?.accountId,
+                accountId: vehicleData.accountId,
+                officerId: vehicleData.officerId,
             };
 
-            if (vehicleData?.accountId) {
+            if (officer.id) {
                 await update(
                     ref(
                         db,
                         "officerPayment/" +
-                            officer.id +
+                            officer.nameLocation +
                             "/" +
                             vehicleData.accountId
                     ),
@@ -93,47 +106,82 @@ const VehicleDetail = () => {
                     { cancelable: false }
                 );
             }
-        } catch (error) {
+        } catch (error: any) {
+            console.log(error.message);
             Alert.alert("Error", "Gagal memproses pembayaran");
         }
     };
 
     useEffect(() => {
-        if (vehicleData?.plateNumber) {
+        if (vehicleData.plateNumber) {
             const vehicleRef = ref(
                 db,
-                "officerPayment/" + officer.id + "/" + vehicleData.accountId
+                "officerPayment/" +
+                    officer.nameLocation +
+                    +"/" +
+                    vehicleData.accountId
             );
-            const unsubscribe = onValue(vehicleRef, async (snapshot) => {
-                const data = snapshot.val();
-                if (data?.paymentStatus === "insite") {
-                    Alert.alert(
-                        "Pembayaran Berhasil",
-                        `Pembayaran berhasil sebesar Rp2000 dan menambah poin 2`,
-                        [{ text: "OK" }]
-                    );
-                    const getSaldo = await get(
-                        ref(db, "users/" + vehicleData.accountId + "/saldo/ovo")
-                    );
-                    const getSaldoCoin = await get(
-                        ref(
-                            db,
-                            "users/" + vehicleData.accountId + "/saldo/coin"
-                        )
-                    );
 
-                    console.log("duid ", getSaldo.val());
-                    update(
-                        ref(
-                            db,
-                            "users/" + vehicleData.accountId + "/" + "saldo"
-                        ),
-                        {
-                            ovo: getSaldo.val() - 2100,
-                            coin: getSaldoCoin.val() + 2,
-                        }
-                    );
-                }
+            const unsubscribe = onValue(vehicleRef, (snapshot) => {
+                (async () => {
+                    const data = snapshot.val();
+                    if (data?.paymentStatus === "insite") {
+                        Alert.alert(
+                            "Pembayaran Berhasil",
+                            `Pembayaran berhasil sebesar Rp2000 dan menambah poin 2`,
+                            [{ text: "OK" }]
+                        );
+
+                        const getSaldo = await get(
+                            ref(
+                                db,
+                                "users/" + vehicleData.accountId + "/saldo/ovo"
+                            )
+                        );
+                        const getSaldoCoin = await get(
+                            ref(
+                                db,
+                                "users/" + vehicleData.accountId + "/saldo/coin"
+                            )
+                        );
+
+                        await update(
+                            ref(
+                                db,
+                                "users/" + vehicleData.accountId + "/saldo"
+                            ),
+                            {
+                                ovo: getSaldo.val() - 2100,
+                                coin: getSaldoCoin.val() + 2,
+                            }
+                        );
+
+                        await set(
+                            push(
+                                ref(
+                                    db,
+                                    "payment/" +
+                                        vehicleData.accountId +
+                                        "/" +
+                                        now.getFullYear() +
+                                        "/" +
+                                        (now.getMonth() + 1)
+                                            .toString()
+                                            .padStart(2, "0")
+                                )
+                            ),
+                            {
+                                plateNumber: vehicleData.plateNumber,
+                                vehicleType: vehicleData.vehicleType,
+                                officerId: vehicleData.officerId,
+                                status: vehicleData.paymentStatus,
+                                timestamp: vehicleData.timestamp,
+                                accountId: vehicleData.accountId,
+                                nameLocation: vehicleData.nameLocation,
+                            }
+                        );
+                    }
+                })();
             });
 
             return () => unsubscribe();

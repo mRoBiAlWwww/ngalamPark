@@ -28,7 +28,6 @@ import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { SvgProps } from "react-native-svg";
-import { setUserAccount } from "@/redux/slice/userAccountSlice";
 
 const showToast = (message: string) => {
     Toast.show({
@@ -96,16 +95,6 @@ const activity: React.FC = () => {
                 const data = snapShot.val();
                 if (data) {
                     const bookingsArray: List[] = Object.values(data);
-                    // dispatch(
-                    //     setUserAccount({
-                    //         id: account.id,
-                    //         name: account.name,
-                    //         PIN: account.PIN,
-                    //         booking: account.booking,
-                    //         bookingList: bookingsArray,
-                    //         email: account.email,
-                    //     })
-                    // );
                     setList(bookingsArray);
                 }
             },

@@ -13,7 +13,8 @@ import { RootState } from "../../../redux/store"; // Sesuaikan path store
 
 const HomeOfficer: React.FC = () => {
     const router = useRouter();
-
+    const officer = useSelector((state: RootState) => state.officerAccount);
+    console.log(officer.nameLocation, " asli");
     return (
         <>
             <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />

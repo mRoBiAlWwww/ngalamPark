@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -19,9 +19,22 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Button from "../../components/ButtonRegister";
 import InputRegister from "../../components/InputRegister";
 import Toast from "react-native-toast-message";
-import { getDatabase, ref, set } from "firebase/database";
+import {
+    equalTo,
+    get,
+    getDatabase,
+    orderByChild,
+    ref,
+    query,
+    set,
+} from "firebase/database";
 type Role = "user" | "officer";
-
+const showToast = (message: string) => {
+    Toast.show({
+        type: "error",
+        text1: message,
+    });
+};
 const signUp: React.FC = () => {
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -37,17 +50,34 @@ const signUp: React.FC = () => {
     const router = useRouter();
     const db = getDatabase(FIREBASE_APP);
 
-    const showToast = (message: string) => {
-        Toast.show({
-            type: "error",
-            text1: message,
-        });
-    };
-
     const isValidEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
     const isWeakPass = (pass: string) => pass.length < 8;
     const isValidCallNumber = (callNumber: string) =>
         /^08\d{10,11}$/.test(callNumber);
+
+    const handleSearch = async (
+        officerNameLocation: string
+    ): Promise<string | null> => {
+        try {
+            const snapShot = await get(
+                query(
+                    ref(db, "parkLocation"),
+                    orderByChild("name"),
+                    equalTo(officerNameLocation.toLowerCase())
+                )
+            );
+
+            let foundKey: string | null = null;
+            snapShot.forEach((childSnapshot) => {
+                foundKey = childSnapshot.key;
+            });
+
+            return foundKey;
+        } catch (error: any) {
+            showToast(error.message);
+            return null;
+        }
+    };
 
     const signUp = async (): Promise<void> => {
         try {
@@ -92,6 +122,7 @@ const signUp: React.FC = () => {
 
                 // await saveData("users/" + uid, userData);
             } else {
+                const nameLocation = await handleSearch(location);
                 try {
                     await set(ref(db, "officer/" + uid), {
                         id: uid,
@@ -100,9 +131,10 @@ const signUp: React.FC = () => {
                         ktp: KTP,
                         role,
                         location,
-                        saldo: 0,
+                        nameLocation,
                     });
                     console.log("Data berhasil ditambahkan");
+                    console.log(nameLocation);
                 } catch (error: any) {
                     showToast(error.message);
                 }
